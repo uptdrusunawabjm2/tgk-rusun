@@ -422,7 +422,7 @@
 { unit: "C4.22", nama: "ZUHAIDA", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 2, uang: 448800 } },
 { unit: "C4.23", nama: "SAYUTI", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 2, uang: 448800 } },
 { unit: "C4.24", nama: " ", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 0, uang: 0 } }
-
+      // ... (data lain tetap sama)
     ];
 
     function formatNumber(num) {
@@ -439,15 +439,22 @@
 
       const tahunFilter = document.getElementById("tahunFilter").value;
       const bulanFilter = document.getElementById("bulanFilter").value;
+      const search = document.getElementById("search").value.toLowerCase();
 
       DATA.forEach(d => {
         const totalBulan = d.y2024.bulan + d.y2025.bulan;
         const totalUang = d.y2024.uang + d.y2025.uang;
 
         let tampil = true;
+
         if (tahunFilter === "2024" && d.y2024.bulan === 0 && d.y2024.uang === 0) tampil = false;
         if (tahunFilter === "2025" && d.y2025.bulan === 0 && d.y2025.uang === 0) tampil = false;
+
         if (bulanFilter === ">3" && totalBulan <= 3) tampil = false;
+
+        if (search && !(d.unit.toLowerCase().includes(search) || d.nama.toLowerCase().includes(search))) {
+          tampil = false;
+        }
 
         if (tampil) {
           sumBulan2024 += d.y2024.bulan;
@@ -482,6 +489,7 @@
 
     document.getElementById("tahunFilter").addEventListener("change", renderTable);
     document.getElementById("bulanFilter").addEventListener("change", renderTable);
+    document.getElementById("search").addEventListener("input", renderTable);
 
     renderTable();
   </script>
