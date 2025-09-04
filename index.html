@@ -6,13 +6,14 @@
   <title>Data Tunggakan GM 2024–2025</title>
   <style>
     :root {
-      --bg: #0b0c0f;          /* gelap elegan */
+      --bg: #0b0c0f;
       --card: #12151a;
       --muted: #9aa3b2;
       --text: #e6e9ef;
-      --accent: #4f46e5;      /* indigo */
+      --accent: #4f46e5;
       --line: #222734;
       --chip: #1b2030;
+      --warn: #ef4444;
     }
     * { box-sizing: border-box; }
     body { margin: 0; font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial; background: var(--bg); color: var(--text); }
@@ -20,7 +21,7 @@
     .title { font-size: clamp(22px, 4vw, 30px); font-weight: 700; letter-spacing: .2px; }
     .sub { color: var(--muted); margin-top: 6px; }
 
-    .toolbar { display: grid; grid-template-columns: 1fr auto auto; gap: 10px; margin-top: 18px; }
+    .toolbar { display: grid; grid-template-columns: 1fr auto auto auto; gap: 10px; margin-top: 18px; }
     .input, select { background: var(--card); border: 1px solid var(--line); color: var(--text); border-radius: 10px; padding: 10px 12px; outline: none; }
     .btn { border: 1px solid var(--line); background: var(--card); color: var(--text); padding: 10px 14px; border-radius: 12px; cursor: pointer; transition: .15s ease; }
     .btn:hover { border-color: #2b3344; transform: translateY(-1px); }
@@ -40,6 +41,8 @@
     .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
     @media (max-width: 860px) { .toolbar { grid-template-columns: 1fr; } .grid-2 { grid-template-columns: 1fr; } }
     .hint { font-size: 12px; color: var(--muted); margin-top: 8px; }
+
+    .warn { color: var(--warn); font-weight: 700; }
   </style>
 </head>
 <body>
@@ -53,6 +56,10 @@
         <option value="all">Semua Tahun</option>
         <option value="2024">Hanya 2024</option>
         <option value="2025">Hanya 2025</option>
+      </select>
+      <select id="bulanFilter">
+        <option value="all">Semua Unit</option>
+        <option value=">3">Tunggakan > 3 Bulan</option>
       </select>
       <button id="btnPencairan" class="btn primary">Buka Pencairan</button>
     </div>
@@ -74,7 +81,11 @@
         <tbody></tbody>
         <tfoot>
           <tr>
-            <td colspan="6">TOTAL</td>
+            <td colspan="2">TOTAL</td>
+            <td id="totalBulan2024">0</td>
+            <td id="totalUang2024">0</td>
+            <td id="totalBulan2025">0</td>
+            <td id="totalUang2025">0</td>
             <td id="totalBulan">0</td>
             <td id="totalUang">0</td>
           </tr>
@@ -82,13 +93,13 @@
       </table>
     </div>
 
-    <div class="hint">Catatan: DATA INI DILARANG UNTUK DIBAGIKAN SELAIN PENGELOLA UPTD<code></code></div>
+    <div class="hint">Catatan: DILARANG MEMBAGIKAN DATA INI SELAIN PENGELOLA UPTD</div>
   </div>
 
   <script>
     // ======= EDIT DATA DI SINI =======
     const DATA = [
-{ unit: "A1.01", nama: "AHMAD FADLIANSYAH", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 0, uang: 0 } },
+      { unit: "A1.01", nama: "AHMAD FADLIANSYAH", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 0, uang: 0 } },
 { unit: "A1.01", nama: "RAHMAD NOOR	", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 0, uang: 0 } },
 { unit: "A1.02", nama: "MUHAMMAD RAMLI", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 7, uang: 1356600 } },
 { unit: "A1.03", nama: "FAISAL", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 0, uang: 0 } },
@@ -411,121 +422,67 @@
 { unit: "C4.22", nama: "ZUHAIDA", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 2, uang: 448800 } },
 { unit: "C4.23", nama: "SAYUTI", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 2, uang: 448800 } },
 { unit: "C4.24", nama: " ", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 0, uang: 0 } }
-
-
-
-
-
-
-
-
     ];
-    // =================================
 
-    const tbody = document.querySelector('#tbl tbody');
-    const totalBulanEl = document.getElementById('totalBulan');
-    const totalUangEl = document.getElementById('totalUang');
-
-    function fmtUang(n){
-      // tampilkan tanpa "Rp", dengan pemisah ribuan
-      return (n||0).toLocaleString('id-ID');
+    function formatNumber(num) {
+      return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
     }
 
-    function rowMatchesFilter(row, q){
-      if(!q) return true;
-      q = q.toLowerCase();
-      return row.unit.toLowerCase().includes(q) || row.nama.toLowerCase().includes(q);
-    }
+    function renderTable() {
+      const tbody = document.querySelector("#tbl tbody");
+      tbody.innerHTML = "";
 
-    function applyYearFilter(row, tahun){
-      if(tahun === 'all') return true;
-      if(tahun === '2024') return (row.y2024?.bulan||0) > 0 || (row.y2024?.uang||0) > 0;
-      if(tahun === '2025') return (row.y2025?.bulan||0) > 0 || (row.y2025?.uang||0) > 0;
-      return true;
-    }
+      let sumBulan2024 = 0, sumUang2024 = 0;
+      let sumBulan2025 = 0, sumUang2025 = 0;
+      let sumBulanTotal = 0, sumUangTotal = 0;
 
-    function render(){
-      const q = document.getElementById('search').value.trim();
-      const tahun = document.getElementById('tahunFilter').value;
-      tbody.innerHTML = '';
+      const tahunFilter = document.getElementById("tahunFilter").value;
+      const bulanFilter = document.getElementById("bulanFilter").value;
 
-      let totalBulan = 0; let totalUang = 0;
+      DATA.forEach(d => {
+        const totalBulan = d.y2024.bulan + d.y2025.bulan;
+        const totalUang = d.y2024.uang + d.y2025.uang;
 
-      DATA.filter(r => rowMatchesFilter(r, q)).filter(r => applyYearFilter(r, tahun)).forEach(r => {
-        const b24 = r.y2024?.bulan || 0;
-        const u24 = r.y2024?.uang  || 0;
-        const b25 = r.y2025?.bulan || 0;
-        const u25 = r.y2025?.uang  || 0;
-        const totB = b24 + b25;
-        const totU = u24 + u25;
-        totalBulan += totB; totalUang += totU;
+        let tampil = true;
+        if (tahunFilter === "2024" && d.y2024.bulan === 0 && d.y2024.uang === 0) tampil = false;
+        if (tahunFilter === "2025" && d.y2025.bulan === 0 && d.y2025.uang === 0) tampil = false;
+        if (bulanFilter === ">3" && totalBulan <= 3) tampil = false;
 
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-          <td>${r.unit}</td>
-          <td>${r.nama}</td>
-          <td>${b24}</td>
-          <td>${fmtUang(u24)}</td>
-          <td>${b25}</td>
-          <td>${fmtUang(u25)}</td>
-          <td>${totB}</td>
-          <td>${fmtUang(totU)}</td>
-        `;
-        tbody.appendChild(tr);
+        if (tampil) {
+          sumBulan2024 += d.y2024.bulan;
+          sumUang2024 += d.y2024.uang;
+          sumBulan2025 += d.y2025.bulan;
+          sumUang2025 += d.y2025.uang;
+          sumBulanTotal += totalBulan;
+          sumUangTotal += totalUang;
+
+          const tr = document.createElement("tr");
+          tr.innerHTML = `
+            <td>${d.unit}</td>
+            <td>${d.nama}</td>
+            <td class="${d.y2024.bulan > 3 ? 'warn' : ''}">${d.y2024.bulan}</td>
+            <td>${formatNumber(d.y2024.uang)}</td>
+            <td class="${d.y2025.bulan > 3 ? 'warn' : ''}">${d.y2025.bulan}</td>
+            <td>${formatNumber(d.y2025.uang)}</td>
+            <td class="${totalBulan > 3 ? 'warn' : ''}">${totalBulan}</td>
+            <td>${formatNumber(totalUang)}</td>
+          `;
+          tbody.appendChild(tr);
+        }
       });
 
-      totalBulanEl.textContent = totalBulan;
-      totalUangEl.textContent = fmtUang(totalUang);
+      document.getElementById("totalBulan2024").textContent = sumBulan2024;
+      document.getElementById("totalUang2024").textContent = formatNumber(sumUang2024);
+      document.getElementById("totalBulan2025").textContent = sumBulan2025;
+      document.getElementById("totalUang2025").textContent = formatNumber(sumUang2025);
+      document.getElementById("totalBulan").textContent = sumBulanTotal;
+      document.getElementById("totalUang").textContent = formatNumber(sumUangTotal);
     }
 
-    document.getElementById('search').addEventListener('input', render);
-    document.getElementById('tahunFilter').addEventListener('change', render);
+    document.getElementById("tahunFilter").addEventListener("change", renderTable);
+    document.getElementById("bulanFilter").addEventListener("change", renderTable);
 
-    // ======= FITUR PENCAIRAN =======
-    // Pencairan: menampilkan daftar ringkas (Nomor Unit + Bulan Tertunggak) berdasar pilihan tahun
-    function buildPencairanHTML(tahun = 'all', query = ''){
-      const title = 'Daftar Pencairan Tunggakan';
-      const filtered = DATA.filter(r => rowMatchesFilter(r, query)).filter(r => applyYearFilter(r, tahun));
-
-      // susun baris ringkas
-      const rows = filtered.map(r => {
-        const b24 = r.y2024?.bulan || 0; const b25 = r.y2025?.bulan || 0;
-        const u24 = r.y2024?.uang  || 0; const u25 = r.y2025?.uang  || 0;
-        const bulanStr = tahun === '2024' ? `${b24} bln` : tahun === '2025' ? `${b25} bln` : `2024: ${b24} bln | 2025: ${b25} bln`;
-        const uangStr  = tahun === '2024' ? `${fmtUang(u24)}` : tahun === '2025' ? `${fmtUang(u25)}` : `2024: ${fmtUang(u24)} | 2025: ${fmtUang(u25)}`;
-        return `<tr><td>${r.unit}</td><td>${bulanStr}</td><td>${uangStr}</td></tr>`;
-      }).join('');
-
-      const html = `<!doctype html>
-      <html lang="id"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-      <title>${title}</title>
-      <style>body{font-family:ui-sans-serif,system-ui;background:#0b0c0f;color:#e6e9ef;margin:0;padding:24px}
-      .head{font-weight:700;font-size:20px;margin-bottom:8px}
-      .muted{color:#9aa3b2;margin-bottom:12px}
-      table{width:100%;border-collapse:collapse}
-      th,td{padding:10px 12px;border-bottom:1px solid #222734;white-space:nowrap;text-align:left}
-      thead th{background:#0f1320;color:#cbd5e1;position:sticky;top:0}
-      .pill{display:inline-block;padding:2px 8px;border:1px solid #222734;border-radius:999px;margin-left:8px;font-size:12px}
-      </style></head>
-      <body>
-        <div class="head">${title}<span class="pill">Tahun: ${tahun==='all'?'Semua':tahun}</span></div>
-        <div class="muted">Ringkasan hanya menampilkan <strong>Nomor Unit</strong>, <strong>Bulan Tertunggak</strong>, dan <strong>Jumlah</strong>.</div>
-        <table><thead><tr><th>Nomor Unit</th><th>Bulan Tertunggak</th><th>Jumlah</th></tr></thead>
-        <tbody>${rows || '<tr><td colspan="3">Tidak ada data</td></tr>'}</tbody></table>
-      </body></html>`;
-      return html;
-    }
-
-    document.getElementById('btnPencairan').addEventListener('click', () => {
-      const tahun = document.getElementById('tahunFilter').value;
-      const q = document.getElementById('search').value.trim();
-      const win = window.open('', '_blank');
-      win.document.write(buildPencairanHTML(tahun, q));
-      win.document.close();
-    });
-
-    // inisialisasi
-    render();
+    renderTable();
   </script>
 </body>
 </html>
