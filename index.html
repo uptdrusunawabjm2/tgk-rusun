@@ -1,9 +1,10 @@
+
 <!doctype html>
 <html lang="id">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Data Tunggakan GM 2024–2025</title>
+  <title>LAYLAN</title>
   <style>
     :root {
       --bg: #0b0c0f;
@@ -13,7 +14,6 @@
       --accent: #4f46e5;
       --line: #222734;
       --chip: #1b2030;
-      --warn: #ef4444;
     }
     * { box-sizing: border-box; }
     body { margin: 0; font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial; background: var(--bg); color: var(--text); }
@@ -21,8 +21,8 @@
     .title { font-size: clamp(22px, 4vw, 30px); font-weight: 700; letter-spacing: .2px; }
     .sub { color: var(--muted); margin-top: 6px; }
 
-    .toolbar { display: grid; grid-template-columns: 1fr auto auto auto; gap: 10px; margin-top: 18px; }
-    .input, select { background: var(--card); border: 1px solid var(--line); color: var(--text); border-radius: 10px; padding: 10px 12px; outline: none; }
+    .toolbar { display: grid; grid-template-columns: 1fr 200px 200px auto auto; gap: 10px; margin-top: 18px; }
+    .input, .select { background: var(--card); border: 1px solid var(--line); color: var(--text); border-radius: 10px; padding: 10px 12px; outline: none; }
     .btn { border: 1px solid var(--line); background: var(--card); color: var(--text); padding: 10px 14px; border-radius: 12px; cursor: pointer; transition: .15s ease; }
     .btn:hover { border-color: #2b3344; transform: translateY(-1px); }
     .btn.primary { background: linear-gradient(180deg, #4f46e5, #4338ca); border: none; }
@@ -35,32 +35,46 @@
     tbody tr:hover { background: #0f1220; }
     tfoot td { font-weight: 700; background: #0e1220; }
 
-    .caps { font-size: 11px; letter-spacing: .8px; text-transform: uppercase; color: var(--muted); }
     .chip { background: var(--chip); border: 1px solid var(--line); border-radius: 999px; padding: 4px 10px; font-size: 12px; display: inline-block; }
-
-    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-    @media (max-width: 860px) { .toolbar { grid-template-columns: 1fr; } .grid-2 { grid-template-columns: 1fr; } }
     .hint { font-size: 12px; color: var(--muted); margin-top: 8px; }
-
-    .warn { color: var(--warn); font-weight: 700; }
+    @media (max-width: 860px) { .toolbar { grid-template-columns: 1fr; } }
   </style>
 </head>
 <body>
   <div class="wrap">
-    <div class="title">Data Tunggakan Penghuni GM </div>
-    <div class="sub"><span class="chip">update–16-09-2025</span></em></div>
+    <div class="title">TEST DARI 100<span class="chip">update–17-09-2025</span></div>
+    <div class="sub"><em>data ini bersifat dinamis mengikuti kondisi terkini</em></div>
+
+    <!-- Tabel Statis -->
+    <div class="card table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Total Tunggakan</th>
+            <th>Total Pelunasan</th>
+            <th>Sisa Tunggakan</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td id="staticTotalUang">0</td>
+            <td id="staticTotalPelunasan">0</td>
+            <td id="staticSisa">0</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
 
     <div class="toolbar">
-      <input id="search" class="input" placeholder="Cari berdasarkan nomor unit / nama" />
-      <select id="tahunFilter">
-        <option value="all">Semua Tahun</option>
-        <option value="2024">Hanya 2024</option>
-        <option value="2025">Hanya 2025</option>
+      <input id="search" class="input" placeholder="Cari nomor unit / nama…" />
+      <select id="statusFilter" class="select">
+        <option value="">Semua Status</option>
+        <option value="Lunas">Lunas</option>
+        <option value="Sebagian">Sebagian</option>
+        <option value="Belum Bayar">Belum Bayar</option>
       </select>
-      <select id="bulanFilter">
-        <option value="all">Semua Unit</option>
-        <option value=">3">Tunggakan > 3 Bulan</option>
-      </select>
+      <input id="dateFilter" type="date" class="input" />
+      <button id="btnReset" class="btn">Reset</button>
       <button id="btnPencairan" class="btn primary">Buka Pencairan</button>
     </div>
 
@@ -68,430 +82,436 @@
       <table id="tbl">
         <thead>
           <tr>
-            <th>Unit</th>
+            <th>Nomor Unit</th>
             <th>Nama</th>
-            <th>Jlh Bulan 2024</th>
-            <th>Jlh Tunggakan 2024</th>
-            <th>Jlh Bulan 2025</th>
-            <th>Jlh Tunggakan 2025</th>
-            <th>Total Bulan</th>
-            <th>Total Tunggakan</th>
+            <th>Jumlah Bulan</th>
+            <th>Jumlah Tunggakan</th>
+            <th>Status Lunas</th>
+            <th>Jumlah Pelunasan</th>
+            <th>Tanggal Pelunasan</th>
           </tr>
         </thead>
         <tbody></tbody>
         <tfoot>
           <tr>
             <td colspan="2">TOTAL</td>
-            <td id="totalBulan2024">0</td>
-            <td id="totalUang2024">0</td>
-            <td id="totalBulan2025">0</td>
-            <td id="totalUang2025">0</td>
             <td id="totalBulan">0</td>
             <td id="totalUang">0</td>
+            <td></td>
+            <td id="totalPelunasan">0</td>
+            <td></td>
           </tr>
         </tfoot>
       </table>
     </div>
 
-    <div class="hint">Catatan: DILARANG MEMBAGIKAN DATA INI</div>
+    <div class="hint">CATATAN: TIDAK UNTUK DIBAGIKAN<code></code></div>
   </div>
 
   <script>
-    // ======= EDIT DATA DI SINI =======
+    // ======= DATA asli tetap sama =======
     const DATA = [
-      { unit: "GM-A1.01", nama: "AHMAD FADLIANSYAH (KELUAR)", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 0, uang: 0 } },
-{ unit: "GM-A1.01", nama: "RAHMAD NOOR	", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 0, uang: 0 } },
-{ unit: "GM-A1.02", nama: "MUHAMMAD RAMLI", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 3, uang: 581400 } },
-{ unit: "GM-A1.03", nama: "FAISAL", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 0, uang: 0 } },
-{ unit: "GM-A1.04", nama: "ARMINA", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 0, uang: 0 } },
-{ unit: "GM-A1.05", nama: "MUHAMMAD RIDHO (KELUAR)", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 0, uang: 0 } },
-{ unit: "GM-A1.06", nama: "SYARIPUDDIN (KELUAR)", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 0, uang: 0 } },
-{ unit: "GM-A1.06", nama: "FADILAH (KELUAR)", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 0, uang: 0 } },
-{ unit: "GM-A1.07", nama: "MAULANA", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 1, uang: 193800 } },
-{ unit: "GM-A1.08", nama: "NASRULLAH", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 1, uang: 193800 } },
-{ unit: "GM-A1.09", nama: "WAHYU DIANTO (KELUAR)", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 0, uang: 0 } },
-{ unit: "GM-A1.09", nama: "FAISAL KAMNOOR", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 0, uang: 0 } },
-{ unit: "GM-A1.10", nama: "MUHAMMAD RAHIM ASY SYARIFI", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 0, uang: 0 } },
-{ unit: "GM-A1.10", nama: "SRI NOORLENA", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 0, uang: 0 } },
-{ unit: "GM-A1.11", nama: "ZULKIPLI", y2024: { bulan: 1, uang: 193800 }, y2025: { bulan: 0, uang: 0 } },
-{ unit: "GM-A1.11", nama: "FAISAL", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 0, uang: 0 } },
-{ unit: "GM-A1.12", nama: "M. ANDRYADI (KELUAR)", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 0, uang: 0 } },
-{ unit: "GM-A1.13", nama: "MARIATUL QIBTIAH", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 2, uang: 387600 } },
-{ unit: "GM-A1.14", nama: "SAM'ANI. H", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 0, uang: 0 } },
-{ unit: "GM-A1.15", nama: "MUHAMMAD SYAIBAN", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 0, uang: 0 } },
-{ unit: "GM-A1.16", nama: "SWANTHO TJITRO WANDIRA", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 0, uang: 0 } },
-{ unit: "GM-A1.17", nama: "RUDI PRASETYO", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 0, uang: 0 } },
-{ unit: "GM-A1.18", nama: "ABDUL RAHMAN (KELUAR)", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 0, uang: 0 } },
-{ unit: "GM-A1.18", nama: "AYU LESTARI (KELUAR)", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 0, uang: 0 } },
-{ unit: "GM-A1.18", nama: "SYAIFUL ANSYARI", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 0, uang: 0 } },
-{ unit: "GM-A1.19", nama: "MUHIDIN", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 2, uang: 387600 } },
-{ unit: "GM-A1.20", nama: "RIZKI AKBAR", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 2, uang: 387600 } },
-{ unit: "GM-A1.21", nama: "AHMAD NAWAWI", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 2, uang: 387600 } },
-{ unit: "GM-A1.22", nama: "MUHAMMAD HASAN", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 0, uang: 0 } },
-{ unit: "GM-A1.23", nama: "AHMAD NUR MAULIDI", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 0, uang: 0 } },
-{ unit: "GM-A1.24", nama: "MUHAMMAD MASRAWI", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 8, uang: 1550400 } },
-{ unit: "GM-A2.01", nama: " ", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 0, uang: 0 } },
-{ unit: "GM-A2.02", nama: " ", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 0, uang: 0 } },
-{ unit: "GM-A2.03", nama: " ", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 0, uang: 0 } },
-{ unit: "GM-A2.04", nama: "BADARRUDIN", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 0, uang: 0 } },
-{ unit: "GM-A2.05", nama: " ", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 0, uang: 0 } },
-{ unit: "GM-A2.06", nama: "SATIA RAHMAN", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 0, uang: 0 } },
-{ unit: "GM-A2.07", nama: "AHMAD RIZALI (KELUAR)", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 0, uang: 0 } },
-{ unit: "GM-A2.08", nama: "", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 0, uang: 0 } },
-{ unit: "GM-A2.09", nama: "ARBANI YANSAH NOOR", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 0, uang: 0 } },
-{ unit: "GM-A2.10", nama: "DENNY HENDRA LESMANA", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 2, uang: 346800 } },
-{ unit: "GM-A2.11", nama: "MAHDI NOR RAHMAN", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 0, uang: 0 } },
-{ unit: "GM-A2.12", nama: "SALMANI", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 3, uang: 520200 } },
-{ unit: "GM-A2.13", nama: "ISMAIL", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 0, uang: 0 } },
-{ unit: "GM-A2.14", nama: "ANDRE IRANI WANTO", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 0, uang: 0 } },
-{ unit: "GM-A2.15", nama: "MUHAMMAD HASAN", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 0, uang: 0 } },
-{ unit: "GM-A2.16", nama: "", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 0, uang: 0 } },
-{ unit: "GM-A2.17", nama: "SITI MISBAH", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 0, uang: 0 } },
-{ unit: "GM-A2.18", nama: "SAHLAN (KELUAR)", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 0, uang: 0 } },
-{ unit: "GM-A2.18", nama: "M. YAMANI", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 0, uang: 0 } },
-{ unit: "GM-A2.19", nama: " ", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 0, uang: 0 } },
-{ unit: "GM-A2.20", nama: "SUBHAN ALFIAN (KELUAR)", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 0, uang: 0 } },
-{ unit: "GM-A2.21", nama: "SAINUDDIN", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 0, uang: 0 } },
-{ unit: "GM-A2.22", nama: "M. EDO KASAFANI HIDAYAT", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 1, uang: 173400 } },
-{ unit: "GM-A2.23", nama: "MUHAMMAD RAHIM ASY SYARIFI", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 0, uang: 0 } },
-{ unit: "GM-A2.24", nama: "MAHDIAN NOOR", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 0, uang: 0 } },
-{ unit: "GM-A3.01", nama: "ZAINAL ABIDIN", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 1, uang: 153000 } },
-{ unit: "GM-A3.02", nama: "SEPTESA INSAN CAESAR", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 1, uang: 153000 } },
-{ unit: "GM-A3.03", nama: " ", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 0, uang: 0 } },
-{ unit: "GM-A3.04", nama: " ", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 0, uang: 0 } },
-{ unit: "GM-A3.05", nama: " ", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 0, uang: 0 } },
-{ unit: "GM-A3.06", nama: "MUHAMMAD IQBAL", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 2, uang: 306000 } },
-{ unit: "GM-A3.07", nama: "MUHAMMAD SAIROJI", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 0, uang: 0 } },
-{ unit: "GM-A3.08", nama: "", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 0, uang: 0 } },
-{ unit: "GM-A3.09", nama: "TATI AISYAH", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 0, uang: 0 } },
-{ unit: "GM-A3.10", nama: "ROYKE ANTONIUS ROOROH", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 0, uang: 0 } },
-{ unit: "GM-A3.11", nama: "HADIYATULLAH", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 3, uang: 459000 } },
-{ unit: "GM-A3.12", nama: "SUPRIADI", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 5, uang: 765000 } },
-{ unit: "GM-A3.13", nama: "JUMANANG DEMANG", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 2, uang: 306000 } },
-{ unit: "GM-A3.14", nama: " ", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 0, uang: 0 } },
-{ unit: "GM-A3.15", nama: " ", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 0, uang: 0 } },
-{ unit: "GM-A3.16", nama: "FATHUR RAHMAN", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 2, uang: 306000 } },
-{ unit: "GM-A3.17", nama: "WAHYUDI HIDAYATULLAH", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 5, uang: 765000 } },
-{ unit: "GM-A3.18", nama: " ", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 0, uang: 0 } },
-{ unit: "GM-A3.19", nama: " ", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 0, uang: 0 } },
-{ unit: "GM-A3.20", nama: " ", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 0, uang: 0 } },
-{ unit: "GM-A3.21", nama: "FAHRUL RAZI S", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 2, uang: 306000 } },
-{ unit: "GM-A3.22", nama: " ", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 0, uang: 0 } },
-{ unit: "GM-A3.23", nama: " ", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 0, uang: 0 } },
-{ unit: "GM-A3.24", nama: " ", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 0, uang: 0 } },
-{ unit: "GM-A4.01", nama: "HANAPI", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 0, uang: 0 } },
-{ unit: "GM-A4.02", nama: " ", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 0, uang: 0 } },
-{ unit: "GM-A4.03", nama: "MUHAMMAD RIDUAN (KELUAR)", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 0, uang: 0 } },
-{ unit: "GM-A4.03", nama: "NUR ALAM (KELUAR)", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 0, uang: 0 } },
-{ unit: "GM-A4.04", nama: " ", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 0, uang: 0 } },
-{ unit: "GM-A4.05", nama: " ", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 0, uang: 0 } },
-{ unit: "GM-A4.06", nama: "RUSMINNURYADI", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 4, uang: 489600 } },
-{ unit: "GM-A4.07", nama: " ", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 0, uang: 0 } },
-{ unit: "GM-A4.08", nama: " ", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 0, uang: 0 } },
-{ unit: "GM-A4.09", nama: "KARYANTO FAJRI (KELUAR)", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 0, uang: 0 } },
-{ unit: "GM-A4.10", nama: " ", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 0, uang: 0 } },
-{ unit: "GM-A4.11", nama: " ", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 0, uang: 0 } },
-{ unit: "GM-A4.12", nama: " ", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 0, uang: 0 } },
-{ unit: "GM-A4.13", nama: "FAUZI", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 0, uang: 0 } },
-{ unit: "GM-A4.14", nama: " ", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 0, uang: 0 } },
-{ unit: "GM-A4.15", nama: " ", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 0, uang: 0 } },
-{ unit: "GM-A4.16", nama: "MARTIN", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 0, uang: 0 } },
-{ unit: "GM-A4.17", nama: "ERNI", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 8, uang: 979200 } },
-{ unit: "GM-A4.18", nama: " ", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 0, uang: 0 } },
-{ unit: "GM-A4.19", nama: " ", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 0, uang: 0 } },
-{ unit: "GM-A4.20", nama: "ALEX ILHAM (KELUAR)", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 0, uang: 0 } },
-{ unit: "GM-A4.20", nama: "SUWARNO", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 0, uang: 0 } },
-{ unit: "GM-A4.21", nama: " ", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 0, uang: 0 } },
-{ unit: "GM-A4.22", nama: " ", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 0, uang: 0 } },
-{ unit: "GM-A4.23", nama: "ILHAM HS (KELUAR)", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 0, uang: 0 } },
-{ unit: "GM-A4.24", nama: " ", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 0, uang: 0 } },
-{ unit: "GM-B1.01", nama: "MUHAMMAD RIFAI'E (KELUAR)", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 0, uang: 0 } },
-{ unit: "GM-B1.01", nama: "M. ASRUL PAJRIN", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 0, uang: 0 } },
-{ unit: "GM-B1.02", nama: "M. RAHADI", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 0, uang: 0 } },
-{ unit: "GM-B1.03", nama: " ", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 0, uang: 0 } },
-{ unit: "GM-B1.04", nama: "MUHAMMAD RIDUAN", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 0, uang: 0 } },
-{ unit: "GM-B1.05", nama: "AHMAD ANSARI", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 1, uang: 193800 } },
-{ unit: "GM-B1.06", nama: "SUTARNO", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 1, uang: 193800 } },
-{ unit: "GM-B1.07", nama: "ERWEN DINATA", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 1, uang: 193800 } },
-{ unit: "GM-B1.08", nama: "DEDI SUSANTO (KELUAR)", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 0, uang: 0 } },
-{ unit: "GM-B1.08", nama: "RUSMALINA", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 2, uang: 387600 } },
-{ unit: "GM-B1.09", nama: "MUHAMMAD MAULIDIN ANSHORI (KELUAR)", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 0, uang: 0 } },
-{ unit: "GM-B1.09", nama: "H. AKHYAR RIJANI", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 0, uang: 0 } },
-{ unit: "GM-B1.10", nama: "WAHYU RAMADHAN", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 0, uang: 0 } },
-{ unit: "GM-B1.11", nama: "AKHMADI", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 0, uang: 0 } },
-{ unit: "GM-B1.12", nama: "M. HERI WAHYUDI", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 1, uang: 193800 } },
-{ unit: "GM-B1.13", nama: "MAHRITA", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 3, uang: 581400 } },
-{ unit: "GM-B1.14", nama: "PAHRURAJI", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 0, uang: 0 } },
-{ unit: "GM-B1.15", nama: "FADLI AZHARI (KELUAR)", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 0, uang: 0 } },
-{ unit: "GM-B1.15", nama: "M. MUHDI", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 0, uang: 0 } },
-{ unit: "GM-B1.16", nama: "AIDI ABDILLAH", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 0, uang: 0 } },
-{ unit: "GM-B1.17", nama: "ERIN WAHYUDI", y2024: { bulan: 4, uang: 775200 }, y2025: { bulan: 8, uang: 1550400 } },
-{ unit: "GM-B1.18", nama: "NOOR RASJID JUNAIDI (KELUAR)", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 0, uang: 0 } },
-{ unit: "GM-B1.18", nama: "AKHMAD SYARIF", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 1, uang: 193800 } },
-{ unit: "GM-B1.19", nama: "HENDRA", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 0, uang: 0 } },
-{ unit: "GM-B1.19", nama: "ARIF", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 0, uang: 0 } },
-{ unit: "GM-B1.20", nama: "MUHAMMAD", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 2, uang: 387600 } },
-{ unit: "GM-B1.21", nama: "NOOR RASJID JUNAIDI (KELUAR)", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 0, uang: 0 } },
-{ unit: "GM-B1.21", nama: "MUHAMMAD ANDRE", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 4, uang: 775200 } },
-{ unit: "GM-B1.22", nama: "DEDE MAULANA GANI", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 2, uang: 387600 } },
-{ unit: "GM-B1.23", nama: "NOORHAFIZI", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 8, uang: 1550400 } },
-{ unit: "GM-B1.24", nama: "RAMLI", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 2, uang: 387600 } },
-{ unit: "GM-B2.01", nama: " ", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 0, uang: 0 } },
-{ unit: "GM-B2.02", nama: "MUHAMMAD NOOR", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 0, uang: 0 } },
-{ unit: "GM-B2.03", nama: "HUSIN", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 3, uang: 520200 } },
-{ unit: "GM-B2.04", nama: "MUH. NAUFAL REZEKI (KELUAR)", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 0, uang: 0 } },
-{ unit: "GM-B2.04", nama: "SEPTIANA EKA SAPUTRI", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 1, uang: 173400 } },
-{ unit: "GM-B2.05", nama: "MUHAMMAD AMIN", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 0, uang: 0 } },
-{ unit: "GM-B2.06", nama: "ANDRE IRANI WANTO", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 0, uang: 0 } },
-{ unit: "GM-B2.07", nama: "KUSUMO HADI WIJOYO", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 8, uang: 1387200 } },
-{ unit: "GM-B2.08", nama: " ", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 0, uang: 0 } },
-{ unit: "GM-B2.09", nama: "MUHAMAD ARIFIN", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 1, uang: 173400 } },
-{ unit: "GM-B2.10", nama: " ", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 0, uang: 0 } },
-{ unit: "GM-B2.11", nama: "ABDUL BAHRI", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 1, uang: 173400 } },
-{ unit: "GM-B2.12", nama: "SUBIHI YANNOOR", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 0, uang: 0 } },
-{ unit: "GM-B2.13", nama: "IRFAN RIZKI FADILLAH", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 0, uang: 0 } },
-{ unit: "GM-B2.14", nama: "SLAMET DWI PURWANTO", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 6, uang: 1040400 } },
-{ unit: "GM-B2.15", nama: " ", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 0, uang: 0 } },
-{ unit: "GM-B2.16", nama: "MUHAMMAD ANDRE", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 0, uang: 0 } },
-{ unit: "GM-B2.17", nama: " ", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 0, uang: 0 } },
-{ unit: "GM-B2.18", nama: "RIAN SAPUTRA (KELUAR)", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 0, uang: 0 } },
-{ unit: "GM-B2.19", nama: "RAHMADI", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 0, uang: 0 } },
-{ unit: "GM-B2.20", nama: "HERRY", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 8, uang: 1387200 } },
-{ unit: "GM-B2.21", nama: "MULIANA", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 6, uang: 1040400 } },
-{ unit: "GM-B2.22", nama: "ABDUL RACHMAN", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 0, uang: 0 } },
-{ unit: "GM-B2.23", nama: "MUHAMMAD ILYAS", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 0, uang: 0 } },
-{ unit: "GM-B2.24", nama: "EDDY", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 0, uang: 0 } },
-{ unit: "GM-B3.01", nama: "MAJERIANNOOR", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 0, uang: 0 } },
-{ unit: "GM-B3.02", nama: "IFAN ARIS", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 0, uang: 0 } },
-{ unit: "GM-B3.02", nama: "NOOR MEGAWATI", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 1, uang: 153000 } },
-{ unit: "GM-B3.03", nama: "SUPIAN", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 3, uang: 459000 } },
-{ unit: "GM-B3.04", nama: "MUHAMMAD YOGI SAPUTRO", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 0, uang: 0 } },
-{ unit: "GM-B3.05", nama: "FADLI RAHMAN", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 3, uang: 459000 } },
-{ unit: "GM-B3.06", nama: "HARIYADI (KELUAR)", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 0, uang: 0 } },
-{ unit: "GM-B3.06", nama: "GALIH DWI KURNIAWAN", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 1, uang: 153000 } },
-{ unit: "GM-B3.07", nama: "AKHMAD", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 0, uang: 0 } },
-{ unit: "GM-B3.08", nama: "MUHAMMAD IHSAN", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 0, uang: 0 } },
-{ unit: "GM-B3.09", nama: " ", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 0, uang: 0 } },
-{ unit: "GM-B3.10", nama: "M. YUHDI", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 0, uang: 0 } },
-{ unit: "GM-B3.11", nama: "MUHAMMAD SAIDI", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 0, uang: 0 } },
-{ unit: "GM-B3.12", nama: "SUPIANNOR", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 0, uang: 0 } },
-{ unit: "GM-B3.13", nama: "FAJERIANSYAH", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 2, uang: 306000 } },
-{ unit: "GM-B3.14", nama: "RAHMATULLAH HAMDI", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 8, uang: 1224000 } },
-{ unit: "GM-B3.15", nama: "MASLIANI (KELUAR)", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 0, uang: 0 } },
-{ unit: "GM-B3.16", nama: " ", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 0, uang: 0 } },
-{ unit: "GM-B3.17", nama: "GUNTUR HADI HASONO", y2024: { bulan: -8, uang: -1224000 }, y2025: { bulan: 0, uang: 0 } },
-{ unit: "GM-B3.17", nama: "MARIAH", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 0, uang: 0 } },
-{ unit: "GM-B3.18", nama: "MUHAMMAD ARBAYU (KELUAR)", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 0, uang: 0 } },
-{ unit: "GM-B3.18", nama: "SUPIYANSYAH", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 0, uang: 0 } },
-{ unit: "GM-B3.19", nama: "M. ARDIANI", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 1, uang: 153000 } },
-{ unit: "GM-B3.20", nama: "MISRANI", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 1, uang: 153000 } },
-{ unit: "GM-B3.21", nama: "ARIF", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 0, uang: 0 } },
-{ unit: "GM-B3.21", nama: "SUHAIMI", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 0, uang: 0 } },
-{ unit: "GM-B3.22", nama: " ", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 0, uang: 0 } },
-{ unit: "GM-B3.23", nama: "MUHAMMAD LUTHFI (KELUAR)", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 0, uang: 0 } },
-{ unit: "GM-B3.24", nama: "HARIYADI (KELUAR)", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 0, uang: 0 } },
-{ unit: "GM-B4.01", nama: " ", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 0, uang: 0 } },
-{ unit: "GM-B4.02", nama: "SYARWANI", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 0, uang: 0 } },
-{ unit: "GM-B4.03", nama: " ", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 0, uang: 0 } },
-{ unit: "GM-B4.04", nama: " ", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 0, uang: 0 } },
-{ unit: "GM-B4.05", nama: "BAHTIAR", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 0, uang: 0 } },
-{ unit: "GM-B4.06", nama: " ", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 0, uang: 0 } },
-{ unit: "GM-B4.07", nama: "AHMAD RIYADI", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 0, uang: 0 } },
-{ unit: "GM-B4.08", nama: "MUHAMMAD FAJRIANOOR", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 1, uang: 122400 } },
-{ unit: "GM-B4.09", nama: "ZAINUDDIN", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 0, uang: 0 } },
-{ unit: "GM-B4.10", nama: "MURNIATI", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 2, uang: 244800 } },
-{ unit: "GM-B4.11", nama: " ", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 0, uang: 0 } },
-{ unit: "GM-B4.12", nama: " ", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 0, uang: 0 } },
-{ unit: "GM-B4.13", nama: "M. INDRA JAYA", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 0, uang: 0 } },
-{ unit: "GM-B4.14", nama: "JONI IDIANSYAH (KELUAR)", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 0, uang: 0 } },
-{ unit: "GM-B4.14", nama: "SAIBATUL ASLAMI", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 2, uang: 244800 } },
-{ unit: "GM-B4.15", nama: "WAHYUJI", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 0, uang: 0 } },
-{ unit: "GM-B4.16", nama: " ", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 0, uang: 0 } },
-{ unit: "GM-B4.17", nama: "HUSNI", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 1, uang: 122400 } },
-{ unit: "GM-B4.18", nama: "MISRANSYAH", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 1, uang: 122400 } },
-{ unit: "GM-B4.19", nama: "HENDRI LESMANA", y2024: { bulan: 2, uang: 244800 }, y2025: { bulan: 8, uang: 979200 } },
-{ unit: "GM-B4.20", nama: "AHMAD EFENDI", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 0, uang: 0 } },
-{ unit: "GM-B4.21", nama: "SURIANSYAH", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 1, uang: 122400 } },
-{ unit: "GM-B4.22", nama: " ", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 0, uang: 0 } },
-{ unit: "GM-B4.23", nama: " ", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 0, uang: 0 } },
-{ unit: "GM-B4.24", nama: " ", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 0, uang: 0 } },
-{ unit: "GM-C0.01", nama: "RENDI ADIWIDYA (KELUAR)", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 0, uang: 0 } },
-{ unit: "GM-C0.01", nama: "LAUW SIN HUN", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 0, uang: 0 } },
-{ unit: "GM-C0.02", nama: " ", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 0, uang: 0 } },
-{ unit: "GM-C0.03", nama: "ZULIANSYAH (KELUAR)", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 0, uang: 0 } },
-{ unit: "GM-C1.01", nama: "AHMAD SADIKIN", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 2, uang: 591600 } },
-{ unit: "GM-C1.02", nama: "DESIAN HANZARIZKI", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 0, uang: 0 } },
-{ unit: "GM-C1.03", nama: "AHMAD RIFANI SIDDIK (KELUAR)", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 0, uang: 0 } },
-{ unit: "GM-C1.03", nama: "IKHMAN RIFALDI", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 0, uang: 0 } },
-{ unit: "GM-C1.04", nama: "RAHMAD", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 1, uang: 295800 } },
-{ unit: "GM-C1.05", nama: "AGATHA GRACE HADI PRATAMA", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 3, uang: 887400 } },
-{ unit: "GM-C1.06", nama: "SURIANSYAH", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 1, uang: 295800 } },
-{ unit: "GM-C1.07", nama: "MUHAMMAD JULIANTO", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 1, uang: 295800 } },
-{ unit: "GM-C1.08", nama: "DWI FITRI YANTO", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 1, uang: 295800 } },
-{ unit: "GM-C1.09", nama: "RUMAINUR ANWAR FUAN", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 0, uang: 0 } },
-{ unit: "GM-C1.10", nama: "MOCHAMAD SULKAN", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 0, uang: 0 } },
-{ unit: "GM-C1.11", nama: "ANANDA RIZKY PERDANA", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 0, uang: 0 } },
-{ unit: "GM-C1.12", nama: "MUHAMMAD ARBAIN", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 0, uang: 0 } },
-{ unit: "GM-C1.13", nama: "MA'RUP", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 1, uang: 295800 } },
-{ unit: "GM-C1.14", nama: "FITRIYANA", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 2, uang: 591600 } },
-{ unit: "GM-C1.15", nama: "RAHMAN", y2024: { bulan: 2, uang: 591600 }, y2025: { bulan: 8, uang: 2366400 } },
-{ unit: "GM-C1.16", nama: " ", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 0, uang: 0 } },
-{ unit: "GM-C1.17", nama: "ROSITA", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 2, uang: 591600 } },
-{ unit: "GM-C1.18", nama: "ZULKIFLI (KELUAR)", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 0, uang: 0 } },
-{ unit: "GM-C1.19", nama: "BAHRUDIN (KELUAR)", y2024: { bulan: 1, uang: 295800 }, y2025: { bulan: 1, uang: 295800 } },
-{ unit: "GM-C1.20", nama: "SITI MISBAH", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 0, uang: 0 } },
-{ unit: "GM-C1.21", nama: "DEWO A. BAHRUDIN", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 0, uang: 0 } },
-{ unit: "GM-C1.22", nama: " ", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 0, uang: 0 } },
-{ unit: "GM-C1.23", nama: "MUHAMMAD GUNTUR", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 2, uang: 591600 } },
-{ unit: "GM-C1.24", nama: "MUHAMMAD ILHAM (KELUAR)", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 0, uang: 0 } },
-{ unit: "GM-C1.24", nama: "MUHAMMAD SAFRUDIN, S.KOM", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 0, uang: 0 } },
-{ unit: "GM-C2.01", nama: "ASRA", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 0, uang: 0 } },
-{ unit: "GM-C2.01", nama: "RIKI YANDRA", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 1, uang: 275400 } },
-{ unit: "GM-C2.02", nama: "AKHMAD RAMALI", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 3, uang: 826200 } },
-{ unit: "GM-C2.03", nama: "ISMU HANSAH", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 0, uang: 0 } },
-{ unit: "GM-C2.04", nama: "ARBAIN (KELUAR)", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 0, uang: 0 } },
-{ unit: "GM-C2.04", nama: "NOR HAIRI", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 0, uang: 0 } },
-{ unit: "GM-C2.05", nama: "RONI", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 4, uang: 1101600 } },
-{ unit: "GM-C2.06", nama: "MUHAMMAD RIDHANI", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 0, uang: 0 } },
-{ unit: "GM-C2.07", nama: "SYARIPUDIN", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 0, uang: 0 } },
-{ unit: "GM-C2.08", nama: " ", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 0, uang: 0 } },
-{ unit: "GM-C2.09", nama: "FERIYADIE, SE", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 2, uang: 550800 } },
-{ unit: "GM-C2.10", nama: " ", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 0, uang: 0 } },
-{ unit: "GM-C2.11", nama: "SYAHRONI", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 1, uang: 275400 } },
-{ unit: "GM-C2.12", nama: "EDDY JULIS", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 0, uang: 0 } },
-{ unit: "GM-C2.13", nama: "MUHAMMAD SALEH", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 0, uang: 0 } },
-{ unit: "GM-C2.14", nama: "HAIRIANI", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 2, uang: 550800 } },
-{ unit: "GM-C2.15", nama: "WAHONO (KELUAR)", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 0, uang: 0 } },
-{ unit: "GM-C2.15", nama: "MIRZA APRIZALDI", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 0, uang: 0 } },
-{ unit: "GM-C2.16", nama: "ALIANSYAH", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 0, uang: 0 } },
-{ unit: "GM-C2.17", nama: "KANCEL", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 2, uang: 550800 } },
-{ unit: "GM-C2.18", nama: "ASRA", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 0, uang: 0 } },
-{ unit: "GM-C2.19", nama: "BAHRUL HADI", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 3, uang: 826200 } },
-{ unit: "GM-C2.20", nama: "SARBANI", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 2, uang: 550800 } },
-{ unit: "GM-C2.21", nama: "ABDUL GANI", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 2, uang: 550800 } },
-{ unit: "GM-C2.22", nama: "BERRY CHRISTIAN HERLIJANTO", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 2, uang: 550800 } },
-{ unit: "GM-C2.23", nama: "ISMAIL", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 0, uang: 0 } },
-{ unit: "GM-C2.24", nama: "YOPPY RUMAGIT (KELUAR)", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 0, uang: 0 } },
-{ unit: "GM-C3.01", nama: "JUHRAINI", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 0, uang: 0 } },
-{ unit: "GM-C3.02", nama: "MUHAMMAD PATHOR RAHMAN", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 0, uang: 0 } },
-{ unit: "GM-C3.03", nama: "PURWANTO", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 0, uang: 0 } },
-{ unit: "GM-C3.04", nama: "M. IDRIS", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 0, uang: 0 } },
-{ unit: "GM-C3.05", nama: "TRISNA SANUSI", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 2, uang: 510000 } },
-{ unit: "GM-C3.06", nama: "SURDANI", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 0, uang: 0 } },
-{ unit: "GM-C3.07", nama: "MUHAMMAD YAMIN", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 0, uang: 0 } },
-{ unit: "GM-C3.08", nama: "MURDANI", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 1, uang: 255000 } },
-{ unit: "GM-C3.09", nama: "AULIA RAHMAN", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 0, uang: 0 } },
-{ unit: "GM-C3.10", nama: "ANSUR RULLAH", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 0, uang: 0 } },
-{ unit: "GM-C3.11", nama: "RAHMADI", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 0, uang: 0 } },
-{ unit: "GM-C3.12", nama: " ", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 0, uang: 0 } },
-{ unit: "GM-C3.13", nama: " ", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 0, uang: 0 } },
-{ unit: "GM-C3.14", nama: "RIDUAN NOR", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 0, uang: 0 } },
-{ unit: "GM-C3.15", nama: "AKHMAD WAHYUDI", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 1, uang: 255000 } },
-{ unit: "GM-C3.16", nama: "HASRUL", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 0, uang: 0 } },
-{ unit: "GM-C3.17", nama: " ", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 0, uang: 0 } },
-{ unit: "GM-C3.18", nama: " ", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 0, uang: 0 } },
-{ unit: "GM-C3.19", nama: "SANUSI / RAMINA", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 1, uang: 255000 } },
-{ unit: "GM-C3.20", nama: "DARMAYANTO", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 2, uang: 510000 } },
-{ unit: "GM-C3.21", nama: " ", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 0, uang: 0 } },
-{ unit: "GM-C3.22", nama: "RAHMAT", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 0, uang: 0 } },
-{ unit: "GM-C3.23", nama: " ", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 0, uang: 0 } },
-{ unit: "GM-C3.24", nama: "MAWARDI (KELUAR)", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 0, uang: 0 } },
-{ unit: "GM-C3.24", nama: "SARLAN", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 0, uang: 0 } },
-{ unit: "GM-C4.01", nama: "ABDUL RASUL", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 1, uang: 224400 } },
-{ unit: "GM-C4.02", nama: "MAHYUDIN (KELUAR)", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 0, uang: 0 } },
-{ unit: "GM-C4.03", nama: "ADITYA", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 1, uang: 224400 } },
-{ unit: "GM-C4.04", nama: "AHMAD SURYANI", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 2, uang: 448800 } },
-{ unit: "GM-C4.05", nama: " ", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 0, uang: 0 } },
-{ unit: "GM-C4.06", nama: "ALFIAN NOOR", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 0, uang: 0 } },
-{ unit: "GM-C4.07", nama: "RAHMANSYAH", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 2, uang: 448800 } },
-{ unit: "GM-C4.08", nama: "SABRAN (KELUAR)", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 0, uang: 0 } },
-{ unit: "GM-C4.09", nama: "ABDUL SYUKUR (KELUAR)", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 0, uang: 0 } },
-{ unit: "GM-C4.09", nama: "GT. RIZAL JULIANTO (KELUAR)", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 0, uang: 0 } },
-{ unit: "GM-C4.10", nama: "HARLI", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 1, uang: 224400 } },
-{ unit: "GM-C4.11", nama: "TAUFIKURAHMAN", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 1, uang: 224400 } },
-{ unit: "GM-C4.12", nama: " ", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 0, uang: 0 } },
-{ unit: "GM-C4.13", nama: "ABDUL MAJID", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 0, uang: 0 } },
-{ unit: "GM-C4.14", nama: "AHMAD YANI (KELUAR)", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 0, uang: 0 } },
-{ unit: "GM-C4.15", nama: "RAHMADI", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 0, uang: 0 } },
-{ unit: "GM-C4.16", nama: "SUPIANI (KELUAR)", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 0, uang: 0 } },
-{ unit: "GM-C4.17", nama: "GARIN RUSMAN AJI", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 0, uang: 0 } },
-{ unit: "GM-C4.18", nama: "HARIS SOFYAN", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 2, uang: 448800 } },
-{ unit: "GM-C4.19", nama: "RAMINA", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 0, uang: 0 } },
-{ unit: "GM-C4.20", nama: "AKHMAD KHAIDIR", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 2, uang: 448800 } },
-{ unit: "GM-C4.21", nama: "RAHMADANI", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 0, uang: 0 } },
-{ unit: "GM-C4.22", nama: "ZUHAIDA", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 2, uang: 448800 } },
-{ unit: "GM-C4.23", nama: "SAYUTI", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 2, uang: 448800 } },
-{ unit: "GM-C4.24", nama: " ", y2024: { bulan: 0, uang: 0 }, y2025: { bulan: 0, uang: 0 } }
-
+          { unit: "GM-A1.01", nama: "AHMAD FADLIANSYAH (KELUAR)", bulan: 2, uang: 387600, pelunasan: 0, tgl: " " },
+{ unit: "GM-A1.01", nama: "RAHMAD NOOR	", bulan: 0, uang: 0, pelunasan: 0, tgl: " " },
+{ unit: "GM-A1.02", nama: "MUHAMMAD RAMLI", bulan: 1, uang: 193800, pelunasan: 0, tgl: " " },
+{ unit: "GM-A1.03", nama: "FAISAL", bulan: 3, uang: 581400, pelunasan: 0, tgl: " " },
+{ unit: "GM-A1.04", nama: "ARMINA", bulan: 3, uang: 581400, pelunasan: 0, tgl: " " },
+{ unit: "GM-A1.05", nama: "MUHAMMAD RIDHO (KELUAR)", bulan: 6, uang: 1162800, pelunasan: 1162800, tgl: "2025-09-09" },
+{ unit: "GM-A1.06", nama: "SYARIPUDDIN (KELUAR)", bulan: 0, uang: 0, pelunasan: 0, tgl: " " },
+{ unit: "GM-A1.06", nama: "FADILAH (KELUAR)", bulan: 0, uang: 0, pelunasan: 0, tgl: " " },
+{ unit: "GM-A1.07", nama: "MAULANA", bulan: 4, uang: 775200, pelunasan: 0, tgl: " " },
+{ unit: "GM-A1.08", nama: "NASRULLAH", bulan: 5, uang: 969000, pelunasan: 0, tgl: " " },
+{ unit: "GM-A1.09", nama: "WAHYU DIANTO (KELUAR)", bulan: 1, uang: 193800, pelunasan: 0, tgl: " " },
+{ unit: "GM-A1.09", nama: "FAISAL KAMNOOR", bulan: 3, uang: 581400, pelunasan: 0, tgl: " " },
+{ unit: "GM-A1.10", nama: "MUHAMMAD RAHIM ASY SYARIFI", bulan: 2, uang: 387600, pelunasan: 0, tgl: " " },
+{ unit: "GM-A1.10", nama: "SRI NOORLENA", bulan: 3, uang: 581400, pelunasan: 0, tgl: " " },
+{ unit: "GM-A1.11", nama: "ZULKIPLI (UNK)", bulan: 0, uang: 0, pelunasan: 0, tgl: " " },
+{ unit: "GM-A1.11", nama: "FAISAL", bulan: 0, uang: 0, pelunasan: 0, tgl: " " },
+{ unit: "GM-A1.12", nama: "M. ANDRYADI (KELUAR)", bulan: 2, uang: 387600, pelunasan: 0, tgl: " " },
+{ unit: "GM-A1.13", nama: "MARIATUL QIBTIAH", bulan: 1, uang: 193800, pelunasan: 0, tgl: " " },
+{ unit: "GM-A1.14", nama: "SAM'ANI. H", bulan: 3, uang: 581400, pelunasan: 0, tgl: " " },
+{ unit: "GM-A1.15", nama: "MUHAMMAD SYAIBAN", bulan: 0, uang: 0, pelunasan: 0, tgl: " " },
+{ unit: "GM-A1.16", nama: "SWANTHO TJITRO WANDIRA", bulan: 3, uang: 581400, pelunasan: 0, tgl: " " },
+{ unit: "GM-A1.17", nama: "RUDI PRASETYO", bulan: 2, uang: 387600, pelunasan: 0, tgl: " " },
+{ unit: "GM-A1.18", nama: "ABDUL RAHMAN (KELUAR)", bulan: 0, uang: 0, pelunasan: 0, tgl: " " },
+{ unit: "GM-A1.18", nama: "AYU LESTARI (KELUAR)", bulan: 0, uang: 0, pelunasan: 0, tgl: " " },
+{ unit: "GM-A1.18", nama: "SYAIFUL ANSYARI", bulan: 3, uang: 581400, pelunasan: 0, tgl: " " },
+{ unit: "GM-A1.19", nama: "MUHIDIN", bulan: 0, uang: 0, pelunasan: 0, tgl: " " },
+{ unit: "GM-A1.20", nama: "RIZKI AKBAR", bulan: 0, uang: 0, pelunasan: 0, tgl: " " },
+{ unit: "GM-A1.21", nama: "AHMAD NAWAWI", bulan: 0, uang: 0, pelunasan: 0, tgl: " " },
+{ unit: "GM-A1.22", nama: "MUHAMMAD HASAN", bulan: 0, uang: 0, pelunasan: 0, tgl: " " },
+{ unit: "GM-A1.23", nama: "AHMAD NUR MAULIDI", bulan: 3, uang: 581400, pelunasan: 0, tgl: " " },
+{ unit: "GM-A1.24", nama: "MUHAMMAD MASRAWI", bulan: 0, uang: 0, pelunasan: 0, tgl: " " },
+{ unit: "GM-A2.01", nama: " ", bulan: 0, uang: 0, pelunasan: 0, tgl: " " },
+{ unit: "GM-A2.02", nama: " ", bulan: 0, uang: 0, pelunasan: 0, tgl: " " },
+{ unit: "GM-A2.03", nama: " ", bulan: 0, uang: 0, pelunasan: 0, tgl: " " },
+{ unit: "GM-A2.04", nama: "BADARRUDIN", bulan: 4, uang: 693600, pelunasan: 0, tgl: " " },
+{ unit: "GM-A2.05", nama: " ", bulan: 0, uang: 0, pelunasan: 0, tgl: " " },
+{ unit: "GM-A2.06", nama: "SATIA RAHMAN", bulan: 3, uang: 520200, pelunasan: 0, tgl: " " },
+{ unit: "GM-A2.07", nama: "AHMAD RIZALI (KELUAR)", bulan: 1, uang: 173400, pelunasan: 0, tgl: " " },
+{ unit: "GM-A2.08", nama: "0", bulan: 0, uang: 0, pelunasan: 0, tgl: " " },
+{ unit: "GM-A2.09", nama: "ARBANI YANSAH NOOR", bulan: 3, uang: 520200, pelunasan: 0, tgl: " " },
+{ unit: "GM-A2.10", nama: "DENNY HENDRA LESMANA", bulan: 3, uang: 520200, pelunasan: 0, tgl: " " },
+{ unit: "GM-A2.11", nama: "MAHDI NOR RAHMAN", bulan: 0, uang: 0, pelunasan: 0, tgl: " " },
+{ unit: "GM-A2.12", nama: "SALMANI", bulan: 2, uang: 346800, pelunasan: 0, tgl: " " },
+{ unit: "GM-A2.13", nama: "ISMAIL", bulan: 1, uang: 173400, pelunasan: 0, tgl: " " },
+{ unit: "GM-A2.14", nama: "ANDRE IRANI WANTO", bulan: 3, uang: 520200, pelunasan: 0, tgl: " " },
+{ unit: "GM-A2.15", nama: "MUHAMMAD HASAN", bulan: 4, uang: 693600, pelunasan: 0, tgl: " " },
+{ unit: "GM-A2.16", nama: "0", bulan: 0, uang: 0, pelunasan: 0, tgl: " " },
+{ unit: "GM-A2.17", nama: "SITI MISBAH", bulan: 3, uang: 520200, pelunasan: 0, tgl: " " },
+{ unit: "GM-A2.18", nama: "SAHLAN (KELUAR)", bulan: 0, uang: 0, pelunasan: 0, tgl: " " },
+{ unit: "GM-A2.18", nama: "M. YAMANI", bulan: 3, uang: 520200, pelunasan: 0, tgl: " " },
+{ unit: "GM-A2.19", nama: " ", bulan: 0, uang: 0, pelunasan: 0, tgl: " " },
+{ unit: "GM-A2.20", nama: "SUBHAN ALFIAN (KELUAR)", bulan: 0, uang: 0, pelunasan: 0, tgl: " " },
+{ unit: "GM-A2.21", nama: "SAINUDDIN", bulan: 4, uang: 693600, pelunasan: 0, tgl: " " },
+{ unit: "GM-A2.22", nama: "M. EDO KASAFANI HIDAYAT", bulan: 2, uang: 346800, pelunasan: 0, tgl: " " },
+{ unit: "GM-A2.23", nama: "MUHAMMAD RAHIM ASY SYARIFI", bulan: 3, uang: 520200, pelunasan: 0, tgl: " " },
+{ unit: "GM-A2.24", nama: "MAHDIAN NOOR", bulan: 1, uang: 173400, pelunasan: 0, tgl: " " },
+{ unit: "GM-A3.01", nama: "ZAINAL ABIDIN", bulan: 2, uang: 306000, pelunasan: 0, tgl: " " },
+{ unit: "GM-A3.02", nama: "SEPTESA INSAN CAESAR", bulan: 4, uang: 612000, pelunasan: 0, tgl: " " },
+{ unit: "GM-A3.03", nama: " ", bulan: 0, uang: 0, pelunasan: 0, tgl: " " },
+{ unit: "GM-A3.04", nama: " ", bulan: 0, uang: 0, pelunasan: 0, tgl: " " },
+{ unit: "GM-A3.05", nama: " ", bulan: 0, uang: 0, pelunasan: 0, tgl: " " },
+{ unit: "GM-A3.06", nama: "MUHAMMAD IQBAL", bulan: 3, uang: 459000, pelunasan: 0, tgl: " " },
+{ unit: "GM-A3.07", nama: "MUHAMMAD SAIROJI", bulan: 5, uang: 765000, pelunasan: 0, tgl: " " },
+{ unit: "GM-A3.08", nama: "0", bulan: 0, uang: 0, pelunasan: 0, tgl: " " },
+{ unit: "GM-A3.09", nama: "TATI AISYAH", bulan: 2, uang: 306000, pelunasan: 0, tgl: " " },
+{ unit: "GM-A3.10", nama: "ROYKE ANTONIUS ROOROH", bulan: 3, uang: 459000, pelunasan: 0, tgl: " " },
+{ unit: "GM-A3.11", nama: "HADIYATULLAH", bulan: 5, uang: 765000, pelunasan: 0, tgl: " " },
+{ unit: "GM-A3.12", nama: "SUPRIADI", bulan: 0, uang: 0, pelunasan: 0, tgl: " " },
+{ unit: "GM-A3.13", nama: "JUMANANG DEMANG", bulan: 3, uang: 459000, pelunasan: 0, tgl: " " },
+{ unit: "GM-A3.14", nama: " ", bulan: 0, uang: 0, pelunasan: 0, tgl: " " },
+{ unit: "GM-A3.15", nama: " ", bulan: 0, uang: 0, pelunasan: 0, tgl: " " },
+{ unit: "GM-A3.16", nama: "FATHUR RAHMAN", bulan: 4, uang: 612000, pelunasan: 0, tgl: " " },
+{ unit: "GM-A3.17", nama: "WAHYUDI HIDAYATULLAH", bulan: 0, uang: 0, pelunasan: 0, tgl: " " },
+{ unit: "GM-A3.18", nama: " ", bulan: 0, uang: 0, pelunasan: 0, tgl: " " },
+{ unit: "GM-A3.19", nama: " ", bulan: 0, uang: 0, pelunasan: 0, tgl: " " },
+{ unit: "GM-A3.20", nama: " ", bulan: 0, uang: 0, pelunasan: 0, tgl: " " },
+{ unit: "GM-A3.21", nama: "FAHRUL RAZI S", bulan: 2, uang: 306000, pelunasan: 0, tgl: " " },
+{ unit: "GM-A3.22", nama: " ", bulan: 0, uang: 0, pelunasan: 0, tgl: " " },
+{ unit: "GM-A3.23", nama: " ", bulan: 0, uang: 0, pelunasan: 0, tgl: " " },
+{ unit: "GM-A3.24", nama: " ", bulan: 0, uang: 0, pelunasan: 0, tgl: " " },
+{ unit: "GM-A4.01", nama: "HANAPI", bulan: 6, uang: 734400, pelunasan: 0, tgl: " " },
+{ unit: "GM-A4.02", nama: " ", bulan: 0, uang: 0, pelunasan: 0, tgl: " " },
+{ unit: "GM-A4.03", nama: "MUHAMMAD RIDUAN (KELUAR)", bulan: 0, uang: 0, pelunasan: 0, tgl: " " },
+{ unit: "GM-A4.03", nama: "NUR ALAM (KELUAR)", bulan: 0, uang: 0, pelunasan: 0, tgl: " " },
+{ unit: "GM-A4.04", nama: " ", bulan: 0, uang: 0, pelunasan: 0, tgl: " " },
+{ unit: "GM-A4.05", nama: " ", bulan: 0, uang: 0, pelunasan: 0, tgl: " " },
+{ unit: "GM-A4.06", nama: "RUSMINNURYADI", bulan: 2, uang: 244800, pelunasan: 0, tgl: " " },
+{ unit: "GM-A4.07", nama: " ", bulan: 0, uang: 0, pelunasan: 0, tgl: " " },
+{ unit: "GM-A4.08", nama: " ", bulan: 0, uang: 0, pelunasan: 0, tgl: " " },
+{ unit: "GM-A4.09", nama: "KARYANTO FAJRI (KELUAR)", bulan: 0, uang: 0, pelunasan: 0, tgl: " " },
+{ unit: "GM-A4.10", nama: " ", bulan: 0, uang: 0, pelunasan: 0, tgl: " " },
+{ unit: "GM-A4.11", nama: " ", bulan: 0, uang: 0, pelunasan: 0, tgl: " " },
+{ unit: "GM-A4.12", nama: " ", bulan: 0, uang: 0, pelunasan: 0, tgl: " " },
+{ unit: "GM-A4.13", nama: "FAUZI", bulan: 6, uang: 734400, pelunasan: 0, tgl: " " },
+{ unit: "GM-A4.14", nama: " ", bulan: 0, uang: 0, pelunasan: 0, tgl: " " },
+{ unit: "GM-A4.15", nama: " ", bulan: 0, uang: 0, pelunasan: 0, tgl: " " },
+{ unit: "GM-A4.16", nama: "MARTIN", bulan: 0, uang: 0, pelunasan: 0, tgl: " " },
+{ unit: "GM-A4.17", nama: "ERNI", bulan: 0, uang: 0, pelunasan: 0, tgl: " " },
+{ unit: "GM-A4.18", nama: " ", bulan: 0, uang: 0, pelunasan: 0, tgl: " " },
+{ unit: "GM-A4.19", nama: " ", bulan: 0, uang: 0, pelunasan: 0, tgl: " " },
+{ unit: "GM-A4.20", nama: "ALEX ILHAM (KELUAR)", bulan: 0, uang: 0, pelunasan: 0, tgl: " " },
+{ unit: "GM-A4.20", nama: "SUWARNO", bulan: 3, uang: 367200, pelunasan: 0, tgl: " " },
+{ unit: "GM-A4.21", nama: " ", bulan: 0, uang: 0, pelunasan: 0, tgl: " " },
+{ unit: "GM-A4.22", nama: " ", bulan: 0, uang: 0, pelunasan: 0, tgl: " " },
+{ unit: "GM-A4.23", nama: "ILHAM HS (KELUAR)", bulan: 0, uang: 0, pelunasan: 0, tgl: " " },
+{ unit: "GM-A4.24", nama: " ", bulan: 0, uang: 0, pelunasan: 0, tgl: " " },
+{ unit: "GM-B1.01", nama: "MUHAMMAD RIFAI'E (KELUAR)", bulan: 0, uang: 0, pelunasan: 0, tgl: " " },
+{ unit: "GM-B1.01", nama: "M. ASRUL PAJRIN", bulan: 3, uang: 581400, pelunasan: 0, tgl: " " },
+{ unit: "GM-B1.02", nama: "M. RAHADI", bulan: 4, uang: 775200, pelunasan: 0, tgl: " " },
+{ unit: "GM-B1.03", nama: " ", bulan: 0, uang: 0, pelunasan: 0, tgl: " " },
+{ unit: "GM-B1.04", nama: "MUHAMMAD RIDUAN", bulan: 3, uang: 581400, pelunasan: 0, tgl: " " },
+{ unit: "GM-B1.05", nama: "AHMAD ANSARI", bulan: 6, uang: 1162800, pelunasan: 1162800, tgl: "2025-09-17" },
+{ unit: "GM-B1.06", nama: "SUTARNO", bulan: 4, uang: 775200, pelunasan: 0, tgl: " " },
+{ unit: "GM-B1.07", nama: "ERWEN DINATA", bulan: 5, uang: 969000, pelunasan: 0, tgl: " " },
+{ unit: "GM-B1.08", nama: "DEDI SUSANTO (KELUAR)", bulan: 0, uang: 0, pelunasan: 0, tgl: " " },
+{ unit: "GM-B1.08", nama: "RUSMALINA", bulan: 2, uang: 387600, pelunasan: 0, tgl: " " },
+{ unit: "GM-B1.09", nama: "MUHAMMAD MAULIDIN ANSHORI (KELUAR)", bulan: 0, uang: 0, pelunasan: 0, tgl: " " },
+{ unit: "GM-B1.09", nama: "H. AKHYAR RIJANI", bulan: 0, uang: 0, pelunasan: 0, tgl: " " },
+{ unit: "GM-B1.10", nama: "WAHYU RAMADHAN", bulan: 1, uang: 193800, pelunasan: 0, tgl: " " },
+{ unit: "GM-B1.11", nama: "AKHMADI", bulan: 3, uang: 581400, pelunasan: 0, tgl: " " },
+{ unit: "GM-B1.12", nama: "M. HERI WAHYUDI", bulan: 6, uang: 1162800, pelunasan: 1162800, tgl: "2025-09-17" },
+{ unit: "GM-B1.13", nama: "MAHRITA", bulan: 5, uang: 969000, pelunasan: 0, tgl: " " },
+{ unit: "GM-B1.14", nama: "PAHRURAJI", bulan: 2, uang: 387600, pelunasan: 0, tgl: " " },
+{ unit: "GM-B1.15", nama: "FADLI AZHARI (KELUAR)", bulan: 0, uang: 0, pelunasan: 0, tgl: " " },
+{ unit: "GM-B1.15", nama: "M. MUHDI", bulan: 3, uang: 581400, pelunasan: 0, tgl: " " },
+{ unit: "GM-B1.16", nama: "AIDI ABDILLAH", bulan: 3, uang: 581400, pelunasan: 0, tgl: " " },
+{ unit: "GM-B1.17", nama: "ERIN WAHYUDI", bulan: 0, uang: 0, pelunasan: 0, tgl: " " },
+{ unit: "GM-B1.18", nama: "NOOR RASJID JUNAIDI (KELUAR)", bulan: 0, uang: 0, pelunasan: 0, tgl: " " },
+{ unit: "GM-B1.18", nama: "AKHMAD SYARIF", bulan: 4, uang: 775200, pelunasan: 0, tgl: " " },
+{ unit: "GM-B1.19", nama: "HENDRA", bulan: 0, uang: 0, pelunasan: 0, tgl: " " },
+{ unit: "GM-B1.19", nama: "ARIF", bulan: 3, uang: 581400, pelunasan: 0, tgl: " " },
+{ unit: "GM-B1.20", nama: "MUHAMMAD", bulan: 6, uang: 1162800, pelunasan: 1162800, tgl: "2025-09-17" },
+{ unit: "GM-B1.21", nama: "NOOR RASJID JUNAIDI (KELUAR)", bulan: 0, uang: 0, pelunasan: 0, tgl: " " },
+{ unit: "GM-B1.21", nama: "MUHAMMAD ANDRE", bulan: 0, uang: 0, pelunasan: 0, tgl: " " },
+{ unit: "GM-B1.22", nama: "DEDE MAULANA GANI", bulan: 2, uang: 387600, pelunasan: 0, tgl: " " },
+{ unit: "GM-B1.23", nama: "NOORHAFIZI", bulan: 2, uang: 387600, pelunasan: 0, tgl: " " },
+{ unit: "GM-B1.24", nama: "RAMLI", bulan: 3, uang: 581400, pelunasan: 0, tgl: " " },
+{ unit: "GM-B2.01", nama: " ", bulan: 0, uang: 0, pelunasan: 0, tgl: " " },
+{ unit: "GM-B2.02", nama: "MUHAMMAD NOOR", bulan: 5, uang: 867000, pelunasan: 0, tgl: " " },
+{ unit: "GM-B2.03", nama: "HUSIN", bulan: 2, uang: 346800, pelunasan: 0, tgl: " " },
+{ unit: "GM-B2.04", nama: "MUH. NAUFAL REZEKI (KELUAR)", bulan: 0, uang: 0, pelunasan: 0, tgl: " " },
+{ unit: "GM-B2.04", nama: "SEPTIANA EKA SAPUTRI", bulan: 3, uang: 520200, pelunasan: 0, tgl: " " },
+{ unit: "GM-B2.05", nama: "MUHAMMAD AMIN", bulan: 3, uang: 520200, pelunasan: 0, tgl: " " },
+{ unit: "GM-B2.06", nama: "ANDRE IRANI WANTO", bulan: 0, uang: 0, pelunasan: 0, tgl: " " },
+{ unit: "GM-B2.07", nama: "KUSUMO HADI WIJOYO", bulan: 0, uang: 0, pelunasan: 0, tgl: " " },
+{ unit: "GM-B2.08", nama: " ", bulan: 0, uang: 0, pelunasan: 0, tgl: " " },
+{ unit: "GM-B2.09", nama: "MUHAMAD ARIFIN", bulan: 2, uang: 346800, pelunasan: 0, tgl: " " },
+{ unit: "GM-B2.10", nama: " ", bulan: 0, uang: 0, pelunasan: 0, tgl: " " },
+{ unit: "GM-B2.11", nama: "ABDUL BAHRI", bulan: 4, uang: 693600, pelunasan: 0, tgl: " " },
+{ unit: "GM-B2.12", nama: "SUBIHI YANNOOR", bulan: 4, uang: 693600, pelunasan: 0, tgl: " " },
+{ unit: "GM-B2.13", nama: "IRFAN RIZKI FADILLAH", bulan: 3, uang: 520200, pelunasan: 0, tgl: " " },
+{ unit: "GM-B2.14", nama: "SLAMET DWI PURWANTO", bulan: 2, uang: 346800, pelunasan: 0, tgl: " " },
+{ unit: "GM-B2.15", nama: " ", bulan: 0, uang: 0, pelunasan: 0, tgl: " " },
+{ unit: "GM-B2.16", nama: "MUHAMMAD ANDRE", bulan: 0, uang: 0, pelunasan: 0, tgl: " " },
+{ unit: "GM-B2.17", nama: " ", bulan: 0, uang: 0, pelunasan: 0, tgl: " " },
+{ unit: "GM-B2.18", nama: "RIAN SAPUTRA (KELUAR)", bulan: 0, uang: 0, pelunasan: 0, tgl: " " },
+{ unit: "GM-B2.19", nama: "RAHMADI", bulan: 5, uang: 867000, pelunasan: 0, tgl: " " },
+{ unit: "GM-B2.20", nama: "HERRY", bulan: 2, uang: 346800, pelunasan: 0, tgl: " " },
+{ unit: "GM-B2.21", nama: "MULIANA", bulan: 2, uang: 346800, pelunasan: 0, tgl: " " },
+{ unit: "GM-B2.22", nama: "ABDUL RACHMAN", bulan: 3, uang: 520200, pelunasan: 0, tgl: " " },
+{ unit: "GM-B2.23", nama: "MUHAMMAD ILYAS", bulan: 4, uang: 693600, pelunasan: 0, tgl: " " },
+{ unit: "GM-B2.24", nama: "EDDY", bulan: 7, uang: 1213800, pelunasan: 1213800, tgl: "2025-09-16" },
+{ unit: "GM-B3.01", nama: "MAJERIANNOOR", bulan: 4, uang: 612000, pelunasan: 0, tgl: " " },
+{ unit: "GM-B3.02", nama: "IFAN ARIS", bulan: 0, uang: 0, pelunasan: 0, tgl: " " },
+{ unit: "GM-B3.02", nama: "NOOR MEGAWATI", bulan: 4, uang: 612000, pelunasan: 0, tgl: " " },
+{ unit: "GM-B3.03", nama: "SUPIAN", bulan: 2, uang: 306000, pelunasan: 0, tgl: " " },
+{ unit: "GM-B3.04", nama: "MUHAMMAD YOGI SAPUTRO", bulan: 3, uang: 459000, pelunasan: 0, tgl: " " },
+{ unit: "GM-B3.05", nama: "FADLI RAHMAN", bulan: 4, uang: 612000, pelunasan: 0, tgl: " " },
+{ unit: "GM-B3.06", nama: "HARIYADI (KELUAR)", bulan: 0, uang: 0, pelunasan: 0, tgl: " " },
+{ unit: "GM-B3.06", nama: "GALIH DWI KURNIAWAN", bulan: 2, uang: 306000, pelunasan: 0, tgl: " " },
+{ unit: "GM-B3.07", nama: "AKHMAD", bulan: 5, uang: 765000, pelunasan: 0, tgl: " " },
+{ unit: "GM-B3.08", nama: "MUHAMMAD IHSAN", bulan: 5, uang: 765000, pelunasan: 0, tgl: " " },
+{ unit: "GM-B3.09", nama: " ", bulan: 0, uang: 0, pelunasan: 0, tgl: " " },
+{ unit: "GM-B3.10", nama: "M. YUHDI", bulan: 6, uang: 918000, pelunasan: 0, tgl: " " },
+{ unit: "GM-B3.11", nama: "MUHAMMAD SAIDI", bulan: 2, uang: 306000, pelunasan: 0, tgl: " " },
+{ unit: "GM-B3.12", nama: "SUPIANNOR", bulan: 5, uang: 765000, pelunasan: 0, tgl: " " },
+{ unit: "GM-B3.13", nama: "FAJERIANSYAH", bulan: 2, uang: 306000, pelunasan: 0, tgl: " " },
+{ unit: "GM-B3.14", nama: "RAHMATULLAH HAMDI", bulan: 0, uang: 0, pelunasan: 0, tgl: " " },
+{ unit: "GM-B3.15", nama: "MASLIANI (KELUAR)", bulan: 0, uang: 0, pelunasan: 0, tgl: " " },
+{ unit: "GM-B3.16", nama: " ", bulan: 0, uang: 0, pelunasan: 0, tgl: " " },
+{ unit: "GM-B3.17", nama: "GUNTUR HADI HASONO (UNK)", bulan: 0, uang: 0, pelunasan: 0, tgl: " " },
+{ unit: "GM-B3.17", nama: "MARIAH", bulan: 3, uang: 459000, pelunasan: 0, tgl: " " },
+{ unit: "GM-B3.18", nama: "MUHAMMAD ARBAYU (KELUAR)", bulan: 0, uang: 0, pelunasan: 0, tgl: " " },
+{ unit: "GM-B3.18", nama: "SUPIYANSYAH", bulan: 1, uang: 153000, pelunasan: 0, tgl: " " },
+{ unit: "GM-B3.19", nama: "M. ARDIANI", bulan: 2, uang: 306000, pelunasan: 0, tgl: " " },
+{ unit: "GM-B3.20", nama: "MISRANI", bulan: 3, uang: 459000, pelunasan: 0, tgl: " " },
+{ unit: "GM-B3.21", nama: "ARIF", bulan: 0, uang: 0, pelunasan: 0, tgl: " " },
+{ unit: "GM-B3.21", nama: "SUHAIMI", bulan: 0, uang: 0, pelunasan: 0, tgl: " " },
+{ unit: "GM-B3.22", nama: " ", bulan: 0, uang: 0, pelunasan: 0, tgl: " " },
+{ unit: "GM-B3.23", nama: "MUHAMMAD LUTHFI (KELUAR)", bulan: 0, uang: 0, pelunasan: 0, tgl: " " },
+{ unit: "GM-B3.24", nama: "HARIYADI (KELUAR)", bulan: 0, uang: 0, pelunasan: 0, tgl: " " },
+{ unit: "GM-B4.01", nama: " ", bulan: 0, uang: 0, pelunasan: 0, tgl: " " },
+{ unit: "GM-B4.02", nama: "SYARWANI", bulan: 5, uang: 612000, pelunasan: 0, tgl: " " },
+{ unit: "GM-B4.03", nama: " ", bulan: 0, uang: 0, pelunasan: 0, tgl: " " },
+{ unit: "GM-B4.04", nama: " ", bulan: 0, uang: 0, pelunasan: 0, tgl: " " },
+{ unit: "GM-B4.05", nama: "BAHTIAR", bulan: 3, uang: 367200, pelunasan: 0, tgl: " " },
+{ unit: "GM-B4.06", nama: " ", bulan: 0, uang: 0, pelunasan: 0, tgl: " " },
+{ unit: "GM-B4.07", nama: "AHMAD RIYADI", bulan: 4, uang: 489600, pelunasan: 0, tgl: " " },
+{ unit: "GM-B4.08", nama: "MUHAMMAD FAJRIANOOR", bulan: 3, uang: 367200, pelunasan: 0, tgl: " " },
+{ unit: "GM-B4.09", nama: "ZAINUDDIN", bulan: 4, uang: 489600, pelunasan: 0, tgl: " " },
+{ unit: "GM-B4.10", nama: "MURNIATI", bulan: 1, uang: 122400, pelunasan: 0, tgl: " " },
+{ unit: "GM-B4.11", nama: " ", bulan: 0, uang: 0, pelunasan: 0, tgl: " " },
+{ unit: "GM-B4.12", nama: " ", bulan: 0, uang: 0, pelunasan: 0, tgl: " " },
+{ unit: "GM-B4.13", nama: "M. INDRA JAYA", bulan: 1, uang: 122400, pelunasan: 0, tgl: " " },
+{ unit: "GM-B4.14", nama: "JONI IDIANSYAH (KELUAR)", bulan: 0, uang: 0, pelunasan: 0, tgl: " " },
+{ unit: "GM-B4.14", nama: "SAIBATUL ASLAMI", bulan: 2, uang: 244800, pelunasan: 0, tgl: " " },
+{ unit: "GM-B4.15", nama: "WAHYUJI", bulan: 1, uang: 122400, pelunasan: 0, tgl: " " },
+{ unit: "GM-B4.16", nama: " ", bulan: 0, uang: 0, pelunasan: 0, tgl: " " },
+{ unit: "GM-B4.17", nama: "HUSNI", bulan: 4, uang: 489600, pelunasan: 0, tgl: " " },
+{ unit: "GM-B4.18", nama: "MISRANSYAH", bulan: 4, uang: 489600, pelunasan: 0, tgl: " " },
+{ unit: "GM-B4.19", nama: "HENDRI LESMANA", bulan: 0, uang: 0, pelunasan: 0, tgl: " " },
+{ unit: "GM-B4.20", nama: "AHMAD EFENDI", bulan: 2, uang: 244800, pelunasan: 0, tgl: " " },
+{ unit: "GM-B4.21", nama: "SURIANSYAH", bulan: 1, uang: 122400, pelunasan: 0, tgl: " " },
+{ unit: "GM-B4.22", nama: " ", bulan: 0, uang: 0, pelunasan: 0, tgl: " " },
+{ unit: "GM-B4.23", nama: " ", bulan: 0, uang: 0, pelunasan: 0, tgl: " " },
+{ unit: "GM-B4.24", nama: " ", bulan: 0, uang: 0, pelunasan: 0, tgl: " " },
+{ unit: "GM-C0.01", nama: "RENDI ADIWIDYA (KELUAR)", bulan: 0, uang: 0, pelunasan: 0, tgl: " " },
+{ unit: "GM-C0.01", nama: "LAUW SIN HUN", bulan: 3, uang: 979200, pelunasan: 0, tgl: " " },
+{ unit: "GM-C0.02", nama: " ", bulan: 0, uang: 0, pelunasan: 0, tgl: " " },
+{ unit: "GM-C0.03", nama: "ZULIANSYAH (KELUAR)", bulan: 0, uang: 0, pelunasan: 0, tgl: " " },
+{ unit: "GM-C1.01", nama: "AHMAD SADIKIN", bulan: 1, uang: 295800, pelunasan: 0, tgl: " " },
+{ unit: "GM-C1.02", nama: "DESIAN HANZARIZKI", bulan: 3, uang: 887400, pelunasan: 0, tgl: " " },
+{ unit: "GM-C1.03", nama: "AHMAD RIFANI SIDDIK (KELUAR)", bulan: 0, uang: 0, pelunasan: 0, tgl: " " },
+{ unit: "GM-C1.03", nama: "IKHMAN RIFALDI", bulan: 2, uang: 591600, pelunasan: 0, tgl: " " },
+{ unit: "GM-C1.04", nama: "RAHMAD", bulan: 6, uang: 1774800, pelunasan: 1774800, tgl: "2025-09-10" },
+{ unit: "GM-C1.05", nama: "AGATHA GRACE HADI PRATAMA", bulan: 2, uang: 591600, pelunasan: 0, tgl: " " },
+{ unit: "GM-C1.06", nama: "SURIANSYAH", bulan: 7, uang: 2070600, pelunasan: 2070600, tgl: "2025-09-10" },
+{ unit: "GM-C1.07", nama: "MUHAMMAD JULIANTO", bulan: 3, uang: 887400, pelunasan: 0, tgl: " " },
+{ unit: "GM-C1.08", nama: "DWI FITRI YANTO", bulan: 3, uang: 887400, pelunasan: 0, tgl: " " },
+{ unit: "GM-C1.09", nama: "RUMAINUR ANWAR FUAN", bulan: 4, uang: 1183200, pelunasan: 1183200, tgl: "2025-09-16" },
+{ unit: "GM-C1.10", nama: "MOCHAMAD SULKAN", bulan: 5, uang: 1479000, pelunasan: 1479000, tgl: "2025-09-11" },
+{ unit: "GM-C1.11", nama: "ANANDA RIZKY PERDANA", bulan: 4, uang: 1183200, pelunasan: 1183200, tgl: "2025-09-16" },
+{ unit: "GM-C1.12", nama: "MUHAMMAD ARBAIN", bulan: 3, uang: 887400, pelunasan: 0, tgl: " " },
+{ unit: "GM-C1.13", nama: "MA'RUP", bulan: 5, uang: 1479000, pelunasan: 1479000, tgl: "2025-09-11" },
+{ unit: "GM-C1.14", nama: "FITRIYANA", bulan: 2, uang: 591600, pelunasan: 0, tgl: " " },
+{ unit: "GM-C1.15", nama: "RAHMAN", bulan: 0, uang: 0, pelunasan: 0, tgl: " " },
+{ unit: "GM-C1.16", nama: " ", bulan: 0, uang: 0, pelunasan: 0, tgl: " " },
+{ unit: "GM-C1.17", nama: "ROSITA", bulan: 4, uang: 1183200, pelunasan: 1183200, tgl: "2025-09-15" },
+{ unit: "GM-C1.18", nama: "ZULKIFLI (KELUAR)", bulan: 2, uang: 591600, pelunasan: 591600, tgl: "2025-09-09" },
+{ unit: "GM-C1.19", nama: "BAHRUDIN (KELUAR)", bulan: 0, uang: 0, pelunasan: 0, tgl: " " },
+{ unit: "GM-C1.20", nama: "SITI MISBAH", bulan: 0, uang: 0, pelunasan: 0, tgl: " " },
+{ unit: "GM-C1.21", nama: "DEWO A. BAHRUDIN", bulan: 3, uang: 887400, pelunasan: 0, tgl: " " },
+{ unit: "GM-C1.22", nama: " ", bulan: 0, uang: 0, pelunasan: 0, tgl: " " },
+{ unit: "GM-C1.23", nama: "MUHAMMAD GUNTUR", bulan: 2, uang: 591600, pelunasan: 0, tgl: " " },
+{ unit: "GM-C1.24", nama: "MUHAMMAD ILHAM (KELUAR)", bulan: 0, uang: 0, pelunasan: 0, tgl: " " },
+{ unit: "GM-C1.24", nama: "MUHAMMAD SAFRUDIN, S.KOM", bulan: 3, uang: 887400, pelunasan: 0, tgl: " " },
+{ unit: "GM-C2.01", nama: "ASRA", bulan: 0, uang: 0, pelunasan: 0, tgl: " " },
+{ unit: "GM-C2.01", nama: "RIKI YANDRA", bulan: 4, uang: 1101600, pelunasan: 0, tgl: " " },
+{ unit: "GM-C2.02", nama: "AKHMAD RAMALI", bulan: 2, uang: 550800, pelunasan: 0, tgl: " " },
+{ unit: "GM-C2.03", nama: "ISMU HANSAH", bulan: 3, uang: 826200, pelunasan: 0, tgl: " " },
+{ unit: "GM-C2.04", nama: "ARBAIN (KELUAR)", bulan: 0, uang: 0, pelunasan: 0, tgl: " " },
+{ unit: "GM-C2.04", nama: "NOR HAIRI", bulan: 1, uang: 275400, pelunasan: 0, tgl: " " },
+{ unit: "GM-C2.05", nama: "RONI", bulan: 3, uang: 826200, pelunasan: 0, tgl: " " },
+{ unit: "GM-C2.06", nama: "MUHAMMAD RIDHANI", bulan: 6, uang: 1652400, pelunasan: 1652400, tgl: "2025-09-11" },
+{ unit: "GM-C2.07", nama: "SYARIPUDIN", bulan: 3, uang: 826200, pelunasan: 826200, tgl: "2025-09-16" },
+{ unit: "GM-C2.08", nama: " ", bulan: 0, uang: 0, pelunasan: 0, tgl: " " },
+{ unit: "GM-C2.09", nama: "FERIYADIE, SE", bulan: 2, uang: 550800, pelunasan: 0, tgl: " " },
+{ unit: "GM-C2.10", nama: " ", bulan: 0, uang: 0, pelunasan: 0, tgl: " " },
+{ unit: "GM-C2.11", nama: "SYAHRONI", bulan: 5, uang: 1377000, pelunasan: 1377000, tgl: "2025-09-15" },
+{ unit: "GM-C2.12", nama: "EDDY JULIS", bulan: 3, uang: 826200, pelunasan: 0, tgl: " " },
+{ unit: "GM-C2.13", nama: "MUHAMMAD SALEH", bulan: 3, uang: 826200, pelunasan: 0, tgl: " " },
+{ unit: "GM-C2.14", nama: "HAIRIANI", bulan: 5, uang: 1377000, pelunasan: 1377000, tgl: "2025-09-15" },
+{ unit: "GM-C2.15", nama: "WAHONO (KELUAR)", bulan: 0, uang: 0, pelunasan: 0, tgl: " " },
+{ unit: "GM-C2.15", nama: "MIRZA APRIZALDI", bulan: 3, uang: 826200, pelunasan: 0, tgl: " " },
+{ unit: "GM-C2.16", nama: "ALIANSYAH", bulan: 3, uang: 826200, pelunasan: 0, tgl: " " },
+{ unit: "GM-C2.17", nama: "KANCEL", bulan: 2, uang: 550800, pelunasan: 0, tgl: " " },
+{ unit: "GM-C2.18", nama: "ASRA", bulan: 6, uang: 1652400, pelunasan: 1652400, tgl: "2025-09-11" },
+{ unit: "GM-C2.19", nama: "BAHRUL HADI", bulan: 3, uang: 826200, pelunasan: 0, tgl: " " },
+{ unit: "GM-C2.20", nama: "SARBANI", bulan: 5, uang: 1377000, pelunasan: 1377000, tgl: "2025-09-15" },
+{ unit: "GM-C2.21", nama: "ABDUL GANI", bulan: 4, uang: 1101600, pelunasan: 0, tgl: " " },
+{ unit: "GM-C2.22", nama: "BERRY CHRISTIAN HERLIJANTO", bulan: 4, uang: 1101600, pelunasan: 0, tgl: " " },
+{ unit: "GM-C2.23", nama: "ISMAIL", bulan: 0, uang: 0, pelunasan: 0, tgl: " " },
+{ unit: "GM-C2.24", nama: "YOPPY RUMAGIT (KELUAR)", bulan: 0, uang: 0, pelunasan: 0, tgl: " " },
+{ unit: "GM-C2.24", nama: "ISMAIL", bulan: 0, uang: 0, pelunasan: 0, tgl: " " },
+{ unit: "GM-C3.01", nama: "JUHRAINI", bulan: 4, uang: 1020000, pelunasan: 0, tgl: " " },
+{ unit: "GM-C3.02", nama: "MUHAMMAD PATHOR RAHMAN", bulan: 3, uang: 765000, pelunasan: 0, tgl: " " },
+{ unit: "GM-C3.03", nama: "PURWANTO", bulan: 5, uang: 1275000, pelunasan: 1275000, tgl: "2025-09-16" },
+{ unit: "GM-C3.04", nama: "M. IDRIS", bulan: 3, uang: 765000, pelunasan: 0, tgl: " " },
+{ unit: "GM-C3.05", nama: "TRISNA SANUSI", bulan: 3, uang: 765000, pelunasan: 0, tgl: " " },
+{ unit: "GM-C3.06", nama: "SURDANI", bulan: 7, uang: 1785000, pelunasan: 1785000, tgl: "2025-09-10" },
+{ unit: "GM-C3.07", nama: "MUHAMMAD YAMIN", bulan: 2, uang: 510000, pelunasan: 0, tgl: " " },
+{ unit: "GM-C3.08", nama: "MURDANI", bulan: 3, uang: 765000, pelunasan: 0, tgl: " " },
+{ unit: "GM-C3.09", nama: "AULIA RAHMAN", bulan: 3, uang: 765000, pelunasan: 0, tgl: " " },
+{ unit: "GM-C3.10", nama: "ANSUR RULLAH", bulan: 3, uang: 765000, pelunasan: 0, tgl: " " },
+{ unit: "GM-C3.11", nama: "RAHMADI", bulan: 3, uang: 765000, pelunasan: 0, tgl: " " },
+{ unit: "GM-C3.12", nama: " ", bulan: 0, uang: 0, pelunasan: 0, tgl: " " },
+{ unit: "GM-C3.13", nama: " ", bulan: 0, uang: 0, pelunasan: 0, tgl: " " },
+{ unit: "GM-C3.14", nama: "RIDUAN NOR", bulan: 2, uang: 510000, pelunasan: 0, tgl: " " },
+{ unit: "GM-C3.15", nama: "AKHMAD WAHYUDI", bulan: 3, uang: 765000, pelunasan: 0, tgl: " " },
+{ unit: "GM-C3.16", nama: "HASRUL", bulan: 3, uang: 765000, pelunasan: 0, tgl: " " },
+{ unit: "GM-C3.17", nama: " ", bulan: 0, uang: 0, pelunasan: 0, tgl: " " },
+{ unit: "GM-C3.18", nama: " ", bulan: 0, uang: 0, pelunasan: 0, tgl: " " },
+{ unit: "GM-C3.19", nama: "SANUSI / RAMINA", bulan: 7, uang: 1785000, pelunasan: 1785000, tgl: "2025-09-10" },
+{ unit: "GM-C3.20", nama: "DARMAYANTO", bulan: 4, uang: 1020000, pelunasan: 0, tgl: " " },
+{ unit: "GM-C3.21", nama: " ", bulan: 0, uang: 0, pelunasan: 0, tgl: " " },
+{ unit: "GM-C3.22", nama: "RAHMAT", bulan: 3, uang: 765000, pelunasan: 0, tgl: " " },
+{ unit: "GM-C3.23", nama: " ", bulan: 0, uang: 0, pelunasan: 0, tgl: " " },
+{ unit: "GM-C3.24", nama: "MAWARDI (KELUAR)", bulan: 1, uang: 255000, pelunasan: 0, tgl: " " },
+{ unit: "GM-C3.24", nama: "SARLAN", bulan: 0, uang: 0, pelunasan: 0, tgl: " " },
+{ unit: "GM-C4.01", nama: "ABDUL RASUL", bulan: 6, uang: 1346400, pelunasan: 1346400, tgl: "2025-09-15" },
+{ unit: "GM-C4.02", nama: "MAHYUDIN (KELUAR)", bulan: 1, uang: 224400, pelunasan: 0, tgl: " " },
+{ unit: "GM-C4.03", nama: "ADITYA", bulan: 6, uang: 1346400, pelunasan: 1346400, tgl: "2025-09-16" },
+{ unit: "GM-C4.04", nama: "AHMAD SURYANI", bulan: 5, uang: 1122000, pelunasan: 1122000, tgl: "2025-09-17" },
+{ unit: "GM-C4.05", nama: " ", bulan: 0, uang: 0, pelunasan: 0, tgl: " " },
+{ unit: "GM-C4.06", nama: "ALFIAN NOOR", bulan: 3, uang: 673200, pelunasan: 0, tgl: " " },
+{ unit: "GM-C4.07", nama: "RAHMANSYAH", bulan: 5, uang: 1122000, pelunasan: 1122000, tgl: "2025-09-17" },
+{ unit: "GM-C4.08", nama: "SABRAN (KELUAR)", bulan: 3, uang: 673200, pelunasan: 0, tgl: " " },
+{ unit: "GM-C4.09", nama: "ABDUL SYUKUR (KELUAR)", bulan: 0, uang: 0, pelunasan: 0, tgl: " " },
+{ unit: "GM-C4.09", nama: "GT. RIZAL JULIANTO (KELUAR)", bulan: 6, uang: 1346400, pelunasan: 1346400, tgl: "2025-09-09" },
+{ unit: "GM-C4.10", nama: "HARLI", bulan: 5, uang: 1122000, pelunasan: 1122000, tgl: "2025-09-17" },
+{ unit: "GM-C4.11", nama: "TAUFIKURAHMAN", bulan: 5, uang: 1122000, pelunasan: 1122000, tgl: "2025-09-17" },
+{ unit: "GM-C4.12", nama: " ", bulan: 0, uang: 0, pelunasan: 0, tgl: " " },
+{ unit: "GM-C4.13", nama: "ABDUL MAJID", bulan: 3, uang: 673200, pelunasan: 0, tgl: " " },
+{ unit: "GM-C4.14", nama: "AHMAD YANI (KELUAR)", bulan: 0, uang: 0, pelunasan: 0, tgl: " " },
+{ unit: "GM-C4.15", nama: "RAHMADI", bulan: 3, uang: 673200, pelunasan: 0, tgl: " " },
+{ unit: "GM-C4.16", nama: "SUPIANI (KELUAR)", bulan: 0, uang: 0, pelunasan: 0, tgl: " " },
+{ unit: "GM-C4.17", nama: "GARIN RUSMAN AJI", bulan: 3, uang: 673200, pelunasan: 0, tgl: " " },
+{ unit: "GM-C4.18", nama: "HARIS SOFYAN", bulan: 3, uang: 673200, pelunasan: 0, tgl: " " },
+{ unit: "GM-C4.19", nama: "RAMINA", bulan: 3, uang: 673200, pelunasan: 0, tgl: " " },
+{ unit: "GM-C4.20", nama: "AKHMAD KHAIDIR", bulan: 1, uang: 224400, pelunasan: 0, tgl: " " },
+{ unit: "GM-C4.21", nama: "RAHMADANI", bulan: 1, uang: 224400, pelunasan: 0, tgl: " " },
+{ unit: "GM-C4.22", nama: "ZUHAIDA", bulan: 2, uang: 448800, pelunasan: 0, tgl: " " },
+{ unit: "GM-C4.23", nama: "SAYUTI", bulan: 4, uang: 897600, pelunasan: 0, tgl: " " },
+{ unit: "GM-C4.24", nama: " ", bulan: 0, uang: 0, pelunasan: 0, tgl: " " }
 
 
     ];
 
-    function formatNumber(num) {
-      return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+    function fmtUang(x) {
+      return x.toLocaleString("id-ID");
     }
 
-    function renderTable() {
+    function getStatus(d) {
+      if (d.pelunasan >= d.uang && d.uang > 0) return "Lunas";
+      if (d.pelunasan > 0 && d.pelunasan < d.uang) return "Sebagian";
+      return "Belum Bayar";
+    }
+
+    function renderTable(query = "", filterStatus = "", filterDate = "") {
       const tbody = document.querySelector("#tbl tbody");
       tbody.innerHTML = "";
 
-      let sumBulan2024 = 0, sumUang2024 = 0;
-      let sumBulan2025 = 0, sumUang2025 = 0;
-      let sumBulanTotal = 0, sumUangTotal = 0;
-
-      const tahunFilter = document.getElementById("tahunFilter").value;
-      const bulanFilter = document.getElementById("bulanFilter").value;
-      const search = document.getElementById("search").value.toLowerCase();
+      let totalBulan = 0;
+      let totalUang = 0;
+      let totalPelunasan = 0;
 
       DATA.forEach(d => {
-        const totalBulan = d.y2024.bulan + d.y2025.bulan;
-        const totalUang = d.y2024.uang + d.y2025.uang;
+        const rowText = `${d.unit} ${d.nama}`.toLowerCase();
+        const status = getStatus(d);
 
-        let tampil = true;
+        if (!rowText.includes(query.toLowerCase())) return;
+        if (filterStatus && status !== filterStatus) return;
+        if (filterDate && d.tgl.trim() !== filterDate) return;
 
-        if (tahunFilter === "2024" && d.y2024.bulan === 0 && d.y2024.uang === 0) tampil = false;
-        if (tahunFilter === "2025" && d.y2025.bulan === 0 && d.y2025.uang === 0) tampil = false;
+        totalBulan += d.bulan;
+        totalUang += d.uang;
+        totalPelunasan += d.pelunasan;
 
-        if (bulanFilter === ">3" && totalBulan <= 3) tampil = false;
-
-        if (search && !(d.unit.toLowerCase().includes(search) || d.nama.toLowerCase().includes(search))) {
-          tampil = false;
-        }
-
-        if (tampil) {
-          sumBulan2024 += d.y2024.bulan;
-          sumUang2024 += d.y2024.uang;
-          sumBulan2025 += d.y2025.bulan;
-          sumUang2025 += d.y2025.uang;
-          sumBulanTotal += totalBulan;
-          sumUangTotal += totalUang;
-
-          const tr = document.createElement("tr");
-          tr.innerHTML = `
-            <td>${d.unit}</td>
-            <td>${d.nama}</td>
-            <td class="${d.y2024.bulan > 3 ? 'warn' : ''}">${d.y2024.bulan}</td>
-            <td>${formatNumber(d.y2024.uang)}</td>
-            <td class="${d.y2025.bulan > 3 ? 'warn' : ''}">${d.y2025.bulan}</td>
-            <td>${formatNumber(d.y2025.uang)}</td>
-            <td class="${totalBulan > 3 ? 'warn' : ''}">${totalBulan}</td>
-            <td>${formatNumber(totalUang)}</td>
-          `;
-          tbody.appendChild(tr);
-        }
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td>${d.unit}</td>
+          <td>${d.nama}</td>
+          <td>${d.bulan}</td>
+          <td>${fmtUang(d.uang)}</td>
+          <td>${status}</td>
+          <td>${fmtUang(d.pelunasan)}</td>
+          <td>${d.tgl || "-"}</td>
+        `;
+        tbody.appendChild(tr);
       });
 
-      document.getElementById("totalBulan2024").textContent = sumBulan2024;
-      document.getElementById("totalUang2024").textContent = formatNumber(sumUang2024);
-      document.getElementById("totalBulan2025").textContent = sumBulan2025;
-      document.getElementById("totalUang2025").textContent = formatNumber(sumUang2025);
-      document.getElementById("totalBulan").textContent = sumBulanTotal;
-      document.getElementById("totalUang").textContent = formatNumber(sumUangTotal);
+      document.getElementById("totalBulan").textContent = totalBulan;
+      document.getElementById("totalUang").textContent = fmtUang(totalUang);
+      document.getElementById("totalPelunasan").textContent = fmtUang(totalPelunasan);
+
+      // Update tabel statis
+      const sisa = totalUang - totalPelunasan;
+      document.getElementById("staticTotalUang").textContent = fmtUang(totalUang);
+      document.getElementById("staticTotalPelunasan").textContent = fmtUang(totalPelunasan);
+      document.getElementById("staticSisa").textContent = fmtUang(sisa);
     }
 
-    document.getElementById("tahunFilter").addEventListener("change", renderTable);
-    document.getElementById("bulanFilter").addEventListener("change", renderTable);
-    document.getElementById("search").addEventListener("input", renderTable);
+    const searchInput = document.getElementById("search");
+    const statusFilter = document.getElementById("statusFilter");
+    const dateFilter = document.getElementById("dateFilter");
+    const btnReset = document.getElementById("btnReset");
+
+    function updateTable() {
+      renderTable(searchInput.value, statusFilter.value, dateFilter.value);
+    }
+
+    searchInput.addEventListener("input", updateTable);
+    statusFilter.addEventListener("change", updateTable);
+    dateFilter.addEventListener("change", updateTable);
+
+    btnReset.addEventListener("click", () => {
+      searchInput.value = "";
+      statusFilter.value = "";
+      dateFilter.value = "";
+      renderTable();
+    });
 
     renderTable();
   </script>
